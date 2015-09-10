@@ -1,0 +1,25 @@
+fos_elastica:
+    clients:
+        default: { host: %elastic_host%, port: %elastic_port% }
+    indexes:
+        shlml:
+            client: default
+            types:
+                document:
+                    mappings:
+                        content: ~
+                    persistence:
+                        driver: orm
+                        model: SHLML\CoreBundle\Entity\Document
+                        finder: ~
+                        provider: ~
+                        listener: ~
+                word:
+                    mappings:
+                        content: ~
+                    persistence:
+                        driver: orm
+                        model: SHLML\CoreBundle\Entity\Word
+                        finder: ~
+                        provider: ~
+                        listener: ~

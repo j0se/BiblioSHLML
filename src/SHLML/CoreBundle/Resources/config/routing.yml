@@ -1,0 +1,7 @@
+shlml_core_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: SHLMLCoreBundle:Default:index }
+
+upload:
+    path:     /upload
+    defaults: { _controller: SHLMLCoreBundle:Document:upload }
