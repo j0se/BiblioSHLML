@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SearchDocumentController extends Controller
 {
+
+
     /*
     public function indexAction($name)
     {
