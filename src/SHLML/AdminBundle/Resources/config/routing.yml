@@ -1,0 +1,15 @@
+show_documents:
+    path:     /docs
+    defaults: { _controller: SHLMLAdminBundle:Admin:showDocuments }
+
+new_document:
+    path:     /newDocument
+    defaults: { _controller: SHLMLAdminBundle:Admin:newDocument }
+
+show_users:
+    path:     /users
+    defaults: { _controller: SHLMLAdminBundle:Admin:showUsers }
+
+new_user:
+    path:     /newUser
+    defaults: { _controller: SHLMLAdminBundle:Admin:newUser }

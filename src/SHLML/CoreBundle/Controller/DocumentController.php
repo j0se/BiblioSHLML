@@ -4,6 +4,7 @@ namespace SHLML\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use SHLML\CoreBundle\Form\DocumentType;
+use SHLML\CoreBundle\Entity\Document;
 
 class DocumentController extends Controller
 {

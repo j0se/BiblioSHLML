@@ -1,7 +1,15 @@
-shlml_core_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: SHLMLCoreBundle:Default:index }
-
 upload:
     path:     /upload
     defaults: { _controller: SHLMLCoreBundle:Document:upload }
+
+index:
+    path: /index
+    defaults: {_controller: SHLMLCoreBundle:SearchDocument:index}
+
+multipleSearch_page:
+    path: /multiple_search
+    defaults: {_controller: SHLMLCoreBundle:SearchDocument:multipleSearchPage}
+
+singleSearch_page:
+    path: /single_search
+    defaults: {_controller: SHLMLCoreBundle:SearchDocument:singleSearchPage}
