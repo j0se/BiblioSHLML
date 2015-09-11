@@ -16,9 +16,9 @@ class DocumentType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('path')
             ->add('content')
             ->add('book')
+            ->add('save', 'submit', array('label' => 'Créer le document'))
         ;
     }
     

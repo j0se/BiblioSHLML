@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Document
  *
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="SHLML\CoreBundle\Entity\DocumentRepository")
+ * @ORM\Entity(repositoryClass="SHLML\CoreBundle\Repository\DocumentRepository")
  * @ORM\HasLifecycleCallbacks
  */
 class Document

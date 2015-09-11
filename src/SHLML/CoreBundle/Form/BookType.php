@@ -21,6 +21,7 @@ class BookType extends AbstractType
             ->add('collection')
             ->add('tomeNumber')
             ->add('private')
+            ->add('save', 'submit', array('label' => 'Créer le volume'))
         ;
     }
     

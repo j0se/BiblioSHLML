@@ -9,7 +9,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * Word
  *
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="SHLML\CoreBundle\Entity\WordRepository")
+ * @ORM\Entity(repositoryClass="SHLML\CoreBundle\Repository\WordRepository")
  * @UniqueEntity("content")
  */
 class Word

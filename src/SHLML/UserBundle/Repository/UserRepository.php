@@ -1,6 +1,6 @@
 <?php
 
-namespace SHLML\UserBundle\Entity;
+namespace SHLML\UserBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 

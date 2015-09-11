@@ -21,6 +21,7 @@ class AppKernel extends Kernel
             new SHLML\CoreBundle\SHLMLCoreBundle(),
             new FOS\UserBundle\FOSUserBundle(),
             new FOS\ElasticaBundle\FOSElasticaBundle(),
+            new SHLML\AdminBundle\SHLMLAdminBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

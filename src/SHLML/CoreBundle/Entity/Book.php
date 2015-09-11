@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Book
  *
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="SHLML\CoreBundle\Entity\BookRepository")
+ * @ORM\Entity(repositoryClass="SHLML\CoreBundle\Repository\BookRepository")
  */
 class Book
 {

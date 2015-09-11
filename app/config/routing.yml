@@ -1,3 +1,7 @@
+shlml_admin:
+    resource: "@SHLMLAdminBundle/Resources/config/routing.yml"
+    prefix:   /admin
+
 shlml_core:
     resource: "@SHLMLCoreBundle/Resources/config/routing.yml"
     prefix:   /
@@ -9,6 +13,3 @@ shlml_user:
 app:
     resource: "@AppBundle/Controller/"
     type:     annotation
-
-fos_user:
-    resource: "@FOSUserBundle/Resources/config/routing/all.xml"
