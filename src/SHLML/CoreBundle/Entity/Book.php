@@ -36,32 +36,11 @@ class Book
     private $author;
 
     /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="date", type="date")
-     */
-    private $date;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="collection", type="string", length=255)
-     */
-    private $collection;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="tomeNumber", type="smallint")
-     */
-    private $tomeNumber;
-
-    /**
      * @var boolean
      *
-     * @ORM\Column(name="private", type="boolean")
+     * @ORM\Column(name="public", type="boolean")
      */
-    private $private;
+    private $public;
 
     /**
      * @ORM\OneToMany(targetEntity="SHLML\CoreBundle\Entity\Document", mappedBy="book")
@@ -134,95 +113,26 @@ class Book
     }
 
     /**
-     * Set date
+     * Set public
      *
-     * @param \DateTime $date
+     * @param boolean $public
      * @return Book
      */
-    public function setDate($date)
+    public function setPublic($public)
     {
-        $this->date = $date;
+        $this->public = $public;
 
         return $this;
     }
 
     /**
-     * Get date
-     *
-     * @return \DateTime 
-     */
-    public function getDate()
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set collection
-     *
-     * @param string $collection
-     * @return Book
-     */
-    public function setCollection($collection)
-    {
-        $this->collection = $collection;
-
-        return $this;
-    }
-
-    /**
-     * Get collection
-     *
-     * @return string 
-     */
-    public function getCollection()
-    {
-        return $this->collection;
-    }
-
-    /**
-     * Set tomeNumber
-     *
-     * @param integer $tomeNumber
-     * @return Book
-     */
-    public function setTomeNumber($tomeNumber)
-    {
-        $this->tomeNumber = $tomeNumber;
-
-        return $this;
-    }
-
-    /**
-     * Get tomeNumber
-     *
-     * @return integer 
-     */
-    public function getTomeNumber()
-    {
-        return $this->tomeNumber;
-    }
-
-    /**
-     * Set private
-     *
-     * @param boolean $private
-     * @return Book
-     */
-    public function setPrivate($private)
-    {
-        $this->private = $private;
-
-        return $this;
-    }
-
-    /**
-     * Get private
+     * Get public
      *
      * @return boolean 
      */
-    public function getPrivate()
+    public function getPublic()
     {
-        return $this->private;
+        return $this->public;
     }
 
     /**

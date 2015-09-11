@@ -1,0 +1,11 @@
+services:
+    sonata.admin.user:
+          class: SHLML\UserBundle\Admin\UserAdmin
+          tags:
+              - { name: sonata.admin, manager_type: orm, group: "Content", label: "User" }
+          arguments:
+              - ~
+              - SHLML\UserBundle\Entity\User
+              - ~
+          #calls:
+          #    - [ setTranslationDomain, [AcmeDemoBundle]]

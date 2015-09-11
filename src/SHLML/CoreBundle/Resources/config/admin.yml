@@ -1,0 +1,11 @@
+services:
+    sonata.admin.book:
+          class: SHLML\CoreBundle\Admin\BookAdmin
+          tags:
+              - { name: sonata.admin, manager_type: orm, group: "Content", label: "Book" }
+          arguments:
+              - ~
+              - SHLML\CoreBundle\Entity\Book
+              - ~
+          #calls:
+          #    - [ setTranslationDomain, [AcmeDemoBundle]]
