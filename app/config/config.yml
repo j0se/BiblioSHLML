@@ -3,6 +3,8 @@ imports:
     - { resource: security.yml }
     - { resource: services.yml }
     - { resource: fos_elastica.yml }
+    - { resource: @SHLMLUserBundle/Resources/config/admin.yml }
+    - { resource: @SHLMLCoreBundle/Resources/config/admin.yml }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # http://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -84,3 +86,13 @@ fos_user:
     db_driver: orm
     firewall_name: main
     user_class: SHLML\UserBundle\Entity\User
+
+sonata_block:
+    default_contexts: [cms]
+    blocks:
+        sonata.admin.block.admin_list:
+            contexts:   [admin]
+
+sonata_admin:
+    title: Administration SHLML
+    #title_logo: bundles/acmedemo/img/fancy_acme_logo.png
