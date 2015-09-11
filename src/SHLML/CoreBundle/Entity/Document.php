@@ -3,6 +3,7 @@
 namespace SHLML\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Document
@@ -47,6 +48,23 @@ class Document
      * @ORM\ManyToOne(targetEntity="SHLML\CoreBundle\Entity\Document", inversedBy="documents")
      */
     private $book;
+
+    /**
+     * unmapped property
+     */
+    public $file;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="updated", type="string", length=255)
+     */
+    private $updated;
+
+    public function __toString()
+    {
+        return strval($this->id);
+    }
 
 
     /**
@@ -126,6 +144,29 @@ class Document
     public function getContent()
     {
         return $this->content;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param string $rand
+     * @return Document
+     */
+    public function setUpdated($rand)
+    {
+        $this->updated = $rand;
+
+        return $this;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return string
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
     }
 
     /**
@@ -213,5 +254,12 @@ class Document
         if ($file = $this->getAbsolutePath()) {
             unlink($file);
         }
+    }
+
+    /**
+     * Updates the hash value to force the preUpdate and postUpdate events to fire
+     */
+    public function refreshUpdated() {
+        $this->setUpdated(sha1(uniqid(mt_rand(), true)));
     }
 }

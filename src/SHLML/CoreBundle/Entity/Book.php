@@ -54,6 +54,7 @@ class Book
     public function __construct()
     {
         $this->documents = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->public=false;
     }
 
     /**
