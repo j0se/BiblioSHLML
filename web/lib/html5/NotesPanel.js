@@ -755,7 +755,7 @@ $(function() {
         filter: function(notes, filteredCallback) {
             return notes.filter(function(note) {
                 var found = searchSort._searchAnnot(note);
-                // if the Search term wasn't found in the root then check all of the replies
+                // if the search term wasn't found in the root then check all of the replies
                 for (var i = 0; i < note._replies.length; ++i) {
                     found = searchSort._searchAnnot(note._replies[i]) || found;
                 }

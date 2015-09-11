@@ -14,6 +14,8 @@ parameters:
     mailer_host:       127.0.0.1
     mailer_user:       ~
     mailer_password:   ~
+    elastic_host : localhost
+    elastic_port : 9200
 
     elastic_host : localhost
     elastic_port : 9200

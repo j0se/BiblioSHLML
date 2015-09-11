@@ -36,7 +36,7 @@ ReaderControl.config = {
      *@property {boolean} [hideControlBar=false] hides the top control bar
      *@property {boolean} [hideDisplayModes=false] hides the display mode dropdown button in the control bar
      *@property {boolean} [hideZoom=false] hides the zoom selection controls in the control bar
-     *@property {boolean} [hideTextSearch=false] hides the text Search controls in the control bar
+     *@property {boolean} [hideTextSearch=false] hides the text search controls in the control bar
      *@property {boolean} [hidePrint=false] hides the print button
      */
 ReaderControl.config.ui = {

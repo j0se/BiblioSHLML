@@ -1396,8 +1396,8 @@
             var $searchForm = $(me.$searchInput.get(0).form);
 
             $searchForm.click(function() {
-                // focus the Search input box if the form was clicked
-                // handles the case were the Search icon image is clicked instead of the input
+                // focus the search input box if the form was clicked
+                // handles the case were the search icon image is clicked instead of the input
                 me.$searchInput.focus();
             });
 

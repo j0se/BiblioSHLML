@@ -4171,7 +4171,7 @@ $.widget( "ui.button", {
 		}
 
 		if ( this.type === "checkbox" || this.type === "radio" ) {
-			// we don't Search against the document in case the element
+			// we don't search against the document in case the element
 			// is disconnected from the DOM
 			ancestor = this.element.parents().last();
 			labelSelector = "label[for='" + this.element.attr("id") + "']";
@@ -5696,7 +5696,7 @@ var menu = $.widget( "ui.menu", {
 	},
 
 	// With no arguments, closes the currently active menu - if nothing is active
-	// it closes all menus.  If passed an argument, it will Search for menus BELOW
+	// it closes all menus.  If passed an argument, it will search for menus BELOW
 	_close: function( startMenu ) {
 		if ( !startMenu ) {
 			startMenu = this.active ? this.active.parent() : this.element;

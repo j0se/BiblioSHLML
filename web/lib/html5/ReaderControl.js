@@ -1850,8 +1850,8 @@
         },
 
         /**
-         *Sets the Search mode.
-         *All sub-sequent text searches will use the Search mode that was set.
+         *Sets the search mode.
+         *All sub-sequent text searches will use the search mode that was set.
          */
         SetSearchModes: function(searchModes) {
             if (!searchModes) {

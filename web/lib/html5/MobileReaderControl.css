@@ -516,7 +516,7 @@ in that state on some Android devices */
     opacity: 1.0;
 }
 
-/* align the Search box with the buttons */
+/* align the search box with the buttons */
 #searchMenuContext .ui-input-search.ui-mini {
     margin: 0.5em 0;
 }

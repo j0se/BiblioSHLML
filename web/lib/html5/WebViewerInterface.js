@@ -274,8 +274,8 @@
          * </ul>
          *
          * @param pattern       the pattern to look for
-         * @param searchMode    must one or a combination of the above Search modes. To
-         *                      combine Search modes, simply pass them as comma separated
+         * @param searchMode    must one or a combination of the above search modes. To
+         *                      combine search modes, simply pass them as comma separated
          *                      values in one string. i.e. "CaseSensitive,WholeWord"
          */
         searchText: function(pattern, searchMode) {
