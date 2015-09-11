@@ -1,0 +1,4 @@
+services:
+#    shlml_admin.example:
+#        class: SHLML\AdminBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
