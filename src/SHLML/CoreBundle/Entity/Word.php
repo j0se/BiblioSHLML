@@ -30,10 +30,10 @@ class Word
      */
     private $content;
 
-    /**
-     * @ORM\OneToMany(targetEntity="SHLML\CoreBundle\Entity\Document")
-     */
-    private $documents;
+    ///**
+    // * @ORM\OneToMany(targetEntity="SHLML\CoreBundle\Entity\Document")
+    // */
+    //private $documents;
 
 
     /**
@@ -69,36 +69,36 @@ class Word
         return $this->content;
     }
 
-    /**
-     * Add documents
-     *
-     * @param \SHLML\CoreBundle\Entity\Document $documents
-     * @return Book
-     */
-    public function addDocument(\SHLML\CoreBundle\Entity\Document $documents)
-    {
-        $this->documents[] = $documents;
+    ///**
+    // * Add documents
+    // *
+    // * @param \SHLML\CoreBundle\Entity\Document $documents
+    // * @return Book
+    // */
+    //public function addDocument(\SHLML\CoreBundle\Entity\Document $documents)
+    //{
+    //    $this->documents[] = $documents;
 
-        return $this;
-    }
+    //    return $this;
+    //}
 
-    /**
-     * Remove documents
-     *
-     * @param \SHLML\CoreBundle\Entity\Document $documents
-     */
-    public function removeDocument(\SHLML\CoreBundle\Entity\Document $documents)
-    {
-        $this->documents->removeElement($documents);
-    }
+    ///**
+    // * Remove documents
+    // *
+    // * @param \SHLML\CoreBundle\Entity\Document $documents
+    // */
+    //public function removeDocument(\SHLML\CoreBundle\Entity\Document $documents)
+    //{
+    //    $this->documents->removeElement($documents);
+    //}
 
-    /**
-     * Get documents
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getDocuments()
-    {
-        return $this->documents;
-    }
+    ///**
+    // * Get documents
+    // *
+    // * @return \Doctrine\Common\Collections\Collection
+    // */
+    //public function getDocuments()
+    //{
+    //    return $this->documents;
+    //}
 }

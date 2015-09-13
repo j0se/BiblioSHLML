@@ -275,7 +275,7 @@ class Document
         // erreur il y a
         $this->file->move($this->getUploadRootDir(), $this->path);
         $stripped = preg_replace('/[^[:punct:]]/', '', $this->getContent());
-        $words = explode($stripped," ");
+        $words = explode(" ",$stripped);
         $em = $this->getDoctrine()->getManager();
         foreach($words as $word){
             $w = new Word();
