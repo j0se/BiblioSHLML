@@ -34,7 +34,14 @@ class BookAdmin extends Admin
         $listMapper
             ->add('name', null, array('label' => 'Nom'))
             ->add('author', null, array('label' => 'Auteur'))
-            ->add('public')
+            ->add('public', null, array('editable' => true))
         ;
+    }
+
+    public function preUpdate($book) {
+        $docs = $book->getDocuments();
+        foreach($docs as $doc){
+            $doc->setPublic($book->getPublic());
+        }
     }
 }

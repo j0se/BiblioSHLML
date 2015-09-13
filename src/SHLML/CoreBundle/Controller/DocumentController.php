@@ -66,16 +66,20 @@ class DocumentController extends Controller
 
         $finder = $this->container->get('fos_elastica.finder.shlml.document');
         $results = array();
-        for($i=0;$i<sizeof($combinations);$i++){
-            $query->setField("content",$combinations[$i]);
+
+        for ($i = 0; $i < sizeof($combinations); $i++) {
+            $query->setField("content", $combinations[$i]);
             $docs = $finder->find($query);
-            if($docs != null){
+            if ($docs != null) {
                 $results[$combinations[$i]] = array();
-                for($j=0;$j<sizeof($docs);$j++){
-                    array_push($results[$combinations[$i]],$docs[$j]->getPath());
+                for ($j = 0; $j < sizeof($docs); $j++) {
+                    if($this->get('security.context')->isGranted('ROLE_USER') || $docs[$j]->getPublic()) {
+                        array_push($results[$combinations[$i]], $docs[$j]->getPath());
+                    }
                 }
             }
         }
+
 
 
         $words = $finder->find($query);

@@ -8,6 +8,7 @@ fos_elastica:
                 document:
                     mappings:
                         content: ~
+                        public: ~
                     persistence:
                         driver: orm
                         model: SHLML\CoreBundle\Entity\Document

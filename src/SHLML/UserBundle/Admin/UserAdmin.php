@@ -39,7 +39,7 @@ class UserAdmin extends Admin
     {
         $listMapper
             ->add('username')
-            ->add('enabled')
+            ->add('enabled', null, array('editable' => true))
             ->add('email')
         ;
     }

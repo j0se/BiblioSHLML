@@ -16,7 +16,7 @@ class DocumentAdmin extends Admin
             ->add('file','file', array('label' => 'Fichier', 'required' => false))
             ->add('name', null, array('label' => 'Nom'))
             ->add('content', null, array('label' => 'Contenu'))
-            ->add('book', null, array('label' => 'Volume','required' => false))
+            ->add('book', 'sonata_type_model', array('label' => 'Volume'))
         ;
     }
 

@@ -4,6 +4,7 @@ namespace SHLML\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use SHLML\CoreBundle\Entity\Word;
 
 /**
  * Document
@@ -45,7 +46,7 @@ class Document
     private $content;
 
     /**
-     * @ORM\ManyToOne(targetEntity="SHLML\CoreBundle\Entity\Document", inversedBy="documents")
+     * @ORM\ManyToOne(targetEntity="SHLML\CoreBundle\Entity\Book", inversedBy="documents")
      */
     private $book;
 
@@ -61,9 +62,16 @@ class Document
      */
     private $updated;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="public", type="boolean")
+     */
+    private $public;
+
     public function __toString()
     {
-        return strval($this->id);
+        return strval($this->name);
     }
 
 
@@ -172,10 +180,10 @@ class Document
     /**
      * Set book
      *
-     * @param \SHLML\CoreBundle\Entity\Document $book
+     * @param \SHLML\CoreBundle\Entity\Book $book
      * @return Document
      */
-    public function setBook(\SHLML\CoreBundle\Entity\Document $book = null)
+    public function setBook(\SHLML\CoreBundle\Entity\Book $book = null)
     {
         $this->book = $book;
 
@@ -185,11 +193,34 @@ class Document
     /**
      * Get book
      *
-     * @return \SHLML\CoreBundle\Entity\Document 
+     * @return \SHLML\CoreBundle\Entity\Book
      */
     public function getBook()
     {
         return $this->book;
+    }
+
+    /**
+     * Set public
+     *
+     * @param boolean $public
+     * @return Book
+     */
+    public function setPublic($public)
+    {
+        $this->public = $public;
+
+        return $this;
+    }
+
+    /**
+     * Get public
+     *
+     * @return boolean
+     */
+    public function getPublic()
+    {
+        return $this->public;
     }
 
     public function getAbsolutePath()
@@ -225,6 +256,7 @@ class Document
             // faites ce que vous voulez pour générer un nom unique
             $this->path = sha1(uniqid(mt_rand(), true)).'.'.$this->file->guessExtension();
         }
+        $this->public = $this->getBook()->getPublic();
     }
 
     /**
@@ -242,7 +274,15 @@ class Document
         // proprement l'entité d'être persistée dans la base de données si
         // erreur il y a
         $this->file->move($this->getUploadRootDir(), $this->path);
-
+        $stripped = preg_replace('/[^[:punct:]]/', '', $this->getContent());
+        $words = explode($stripped," ");
+        $em = $this->getDoctrine()->getManager();
+        foreach($words as $word){
+            $w = new Word();
+            $w->setContent($word);
+            $em->persist($w);
+        }
+        $em->flush();
         unset($this->file);
     }
 
@@ -253,6 +293,16 @@ class Document
     {
         if ($file = $this->getAbsolutePath()) {
             unlink($file);
+            //$em = $this->getDoctrine()->getManager();
+            //$repository = $em->getRepository('SHLMLCoreBundle:Word');
+            //$words = $repository->findByDocuments($this);
+            //foreach($words as $word){
+            //    $word->removeDocument($this);
+            //    if(0==sizeof($word->getDocuments())){
+            //        $em->remove($word);
+            //    }
+            //}
+            //$em->flush();
         }
     }
 

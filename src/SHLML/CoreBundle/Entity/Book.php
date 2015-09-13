@@ -57,6 +57,11 @@ class Book
         $this->public=false;
     }
 
+    public function __toString()
+    {
+        return strval($this->author . " - " . $this->name);
+    }
+
     /**
      * Get id
      *
