@@ -41,11 +41,15 @@ class DocumentController extends Controller
     public function searchAction($term){
         $finder = $this->container->get('fos_elastica.finder.shlml.word');
         $terms = explode(" ",$term);
+        var_dump($terms);
         $found = array();
         $query = new \Elastica\Query\Fuzzy();
+
+        $query->setField("content",$terms[0]);
         $query->setFieldOption("fuzziness",2);
-        for($i=0;$i<sizeof($terms);$i++){
-            $query->setField("content",$terms[$i]);
+        array_push($found,$finder->find($query));
+        for($i=1;$i<sizeof($terms);$i++){
+            $query->getParams()['content']['value'] = $terms[$i];
             array_push($found,$finder->find($query));
         }
 
@@ -68,7 +72,7 @@ class DocumentController extends Controller
         $results = array();
 
         for ($i = 0; $i < sizeof($combinations); $i++) {
-            $query->setField("content", $combinations[$i]);
+            $query->getParams()['content']['value'] = $combinations[$i];
             $docs = $finder->find($query);
             if ($docs != null) {
                 $results[$combinations[$i]] = array();
