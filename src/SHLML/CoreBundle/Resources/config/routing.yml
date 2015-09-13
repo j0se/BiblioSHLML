@@ -18,3 +18,7 @@ multipleSearch_page:
 singleSearch_page:
     path: /single_search
     defaults: {_controller: SHLMLCoreBundle:SearchDocument:singleSearchPage}
+
+search:
+    path:     /search/{term}
+    defaults: { _controller: SHLMLCoreBundle:Document:search }

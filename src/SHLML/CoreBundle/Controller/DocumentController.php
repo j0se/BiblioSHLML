@@ -41,15 +41,12 @@ class DocumentController extends Controller
     public function searchAction($term){
         $finder = $this->container->get('fos_elastica.finder.shlml.word');
         $terms = explode(" ",$term);
-        var_dump($terms);
         $found = array();
-        $query = new \Elastica\Query\Fuzzy();
 
-        $query->setField("content",$terms[0]);
-        $query->setFieldOption("fuzziness",2);
-        array_push($found,$finder->find($query));
-        for($i=1;$i<sizeof($terms);$i++){
-            $query->getParams()['content']['value'] = $terms[$i];
+        foreach($terms as $term){
+            $query = new \Elastica\Query\Fuzzy();
+            $query->setField("content",$term);
+            $query->setFieldOption("fuzziness",2);
             array_push($found,$finder->find($query));
         }
 
@@ -71,24 +68,23 @@ class DocumentController extends Controller
         $finder = $this->container->get('fos_elastica.finder.shlml.document');
         $results = array();
 
-        for ($i = 0; $i < sizeof($combinations); $i++) {
-            $query->getParams()['content']['value'] = $combinations[$i];
+        foreach($combinations as $c) {
+            $query = new \Elastica\Query\Fuzzy();
+            $query->setField("content",$c);
+            $query->setFieldOption("fuzziness",2);
             $docs = $finder->find($query);
+            //var_dump($docs);
             if ($docs != null) {
-                $results[$combinations[$i]] = array();
-                for ($j = 0; $j < sizeof($docs); $j++) {
-                    if($this->get('security.context')->isGranted('ROLE_USER') || $docs[$j]->getPublic()) {
-                        array_push($results[$combinations[$i]], $docs[$j]->getPath());
+                $results[$c] = array();
+                foreach($docs as $doc) {
+                    if($this->get('security.context')->isGranted('ROLE_USER') || $doc->getPublic()) {
+                        array_push($results[$c], $doc->getPath());
                     }
                 }
             }
         }
-
-
-
-        $words = $finder->find($query);
-        var_dump($query);
-        var_dump($words);
+        echo "result";
+        var_dump($results);
         //return $this->render('blog/results.html.twig', array('result'=>$results));
     }
 
