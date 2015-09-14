@@ -6,6 +6,9 @@ upload:
     path:     /upload
     defaults: { _controller: SHLMLCoreBundle:Document:upload }
 
+search:
+    path: /search/{term}
+    defaults: {_controller: SHLMLCoreBundle:Document:search}
 
 blog_index:
     path: /index

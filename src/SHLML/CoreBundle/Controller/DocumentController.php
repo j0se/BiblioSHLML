@@ -37,21 +37,26 @@ class DocumentController extends Controller
         }
         return($res);
     }
-
+    /*
+     *@term
+     */
     public function searchAction($term){
+        $term ="le patriote de la meurthe";
+
         $finder = $this->container->get('fos_elastica.finder.shlml.word');
         $terms = explode(" ",$term);
         var_dump($terms);
         $found = array();
-        $query = new \Elastica\Query\Fuzzy();
+        //var_dump($query);
 
-        $query->setField("content",$terms[0]);
-        $query->setFieldOption("fuzziness",2);
-        array_push($found,$finder->find($query));
-        for($i=1;$i<sizeof($terms);$i++){
-            $query->getParams()['content']['value'] = $terms[$i];
+        for($i=0;$i<sizeof($terms);$i++){
+            $query = new \Elastica\Query\Fuzzy();
+            $query->setField("content",$terms[$i]);
+            $query->setFieldOption("fuzziness",3);
             array_push($found,$finder->find($query));
         }
+
+        //var_dump($found);
 
         $combinations = array();
         for($i=0;$i<sizeof($found[0]);$i++){
@@ -67,13 +72,21 @@ class DocumentController extends Controller
             }
             $combinations = $temp;
         }
+        //var_dump($combinations);
+
 
         $finder = $this->container->get('fos_elastica.finder.shlml.document');
         $results = array();
 
         for ($i = 0; $i < sizeof($combinations); $i++) {
-            $query->getParams()['content']['value'] = $combinations[$i];
+
+            $query = new \Elastica\Query\Match();
+            $query->setFieldQuery('content', $combinations[$i]);
+            $query->setFieldType('content','phrase');
+
+
             $docs = $finder->find($query);
+
             if ($docs != null) {
                 $results[$combinations[$i]] = array();
                 for ($j = 0; $j < sizeof($docs); $j++) {
@@ -84,12 +97,13 @@ class DocumentController extends Controller
             }
         }
 
+        var_dump($results);
+        $documents = $finder->find($query);
 
 
-        $words = $finder->find($query);
-        var_dump($query);
-        var_dump($words);
-        //return $this->render('blog/results.html.twig', array('result'=>$results));
+        // var_dump($query);
+        //var_dump($documents);
+        return $results;
     }
 
 
