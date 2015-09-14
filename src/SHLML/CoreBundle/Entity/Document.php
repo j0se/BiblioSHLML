@@ -274,15 +274,6 @@ class Document
         // proprement l'entité d'être persistée dans la base de données si
         // erreur il y a
         $this->file->move($this->getUploadRootDir(), $this->path);
-        $stripped = preg_replace('/[^[:punct:]]/', '', $this->getContent());
-        $words = explode(" ",$stripped);
-        $em = $this->getDoctrine()->getManager();
-        foreach($words as $word){
-            $w = new Word();
-            $w->setContent($word);
-            $em->persist($w);
-        }
-        $em->flush();
         unset($this->file);
     }
 
