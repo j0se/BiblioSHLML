@@ -7,23 +7,23 @@
         <script language="javascript">
 
             var searchedWord = '{{ searchedWord }}' ;
-            var chosenDoc ='{{ chosenDoc }}';
-            var documentList = {{ documentList|json_encode|raw }};
+            var selectedWord ='{{ selectedWord }}';
             var wordList = {{ wordList|json_encode|raw }};
+            var selectedDocument = '{{ selectedDocument }}';
+
             var path = "http://localhost/BiblioSHLML/web/pdf/";
-            var i=documentList.indexOf(chosenDoc);
-            var j=wordList.indexOf(searchedWord);
+            var j=wordList.indexOf(selectedWord);
             var viewerElement;
             var myWebViewer;
 
             $(function() {
-
                 document.getElementById('#searchedWord').value=searchedWord;
+                document.getElementById('#selectedWord').value=selectedWord;
                 viewerElement = document.getElementById('viewer');
                 myWebViewer = new PDFTron.WebViewer({
                     path: "http://localhost/BiblioSHLML/web/lib",
-                    initialDoc: path + documentList[i],
-                    custom: searchedWord,
+                    initialDoc: path + selectedDocument,
+                    custom: selectedWord,
                     showToolbarControl: false,
                     enableReadOnlyMode: true
                 }, viewerElement);
@@ -31,24 +31,16 @@
                 $(viewerElement).on("toolModeChanged", function(event) {
                     myWebViewer.setToolMode(PDFTron.WebViewer.ToolMode.Pan);
                 });
-                
-
             });
         </script>
 
         <script language="javascript">
-            function changeDoc(form) {
-                if (chosenDoc != documentList[form.SelectDoc.selectedIndex]){
-                    document.getElementById('#form').submit();
-                }
+            function changeWord(form) {
+                j = SelectWord.selectedIndex;
+                document.getElementById('#selectedWord').value=wordList[j];
+                document.getElementById('#form').submit();
             }
 
-            function changeWord(form) {
-                if (chosenDoc!= wordList[form.SelectWord.selectedIndex]){
-                    document.getElementById('#searchedWord').value=wordList[form.SelectWord.selectedIndex];
-                    document.getElementById('#form').submit();
-                }
-            }
         </script>
     {% endblock %}
 
@@ -57,23 +49,10 @@
 
             <form id="#form" method="POST" action="single_search">
                 <label> Texte Recherché </label>
-                <input name="searchedWord" id="#searchedWord"/>
+                <input name="searchedWord" id="#searchedWord"/>;
                 <input id="#searchButton" type="submit" value="Valider"> </input>
                 <p></p>
 
-                Choisir un document contenant ce mot dans la liste déroulante:
-                <select style="width: 200px" name='SelectDoc' id='SelectDoc' onChange='changeDoc(this.form)'>
-                    <script language="javascript">
-                        for(var k=0; k<documentList.length; k++){
-                            if(k==i) {
-                                document.write("<option selected>" + documentList[k] + "</option>");
-                            } else {
-                                document.write("<option>" + documentList[k] + "</option>");
-                            }
-                        }
-                    </script>
-                </select>
-                <p></p>
                 Choisir un mot similaire dans la liste déroulante :
                 <select style="width: 200px" name='SelectWord' id='SelectWord' onChange='changeWord(this.form)'>
                     <script language="javascript">
@@ -84,7 +63,11 @@
                                 document.write("<option>" + wordList[k] + "</option>");
                             }
                         }
-                        // document.write("<input type='hidden' id='#searchText' name='fullSearch' value='" + wordList[this.SelectWord.selectedIndex] + "'/>" );
+                        document.write("<input type='hidden' name='soughtWord' id='#soughtWord' value='" + searchedWord + "'/>" )
+                        document.write("<input type='hidden' name='selectedWord' id='#selectedWord' value='" + wordList[j] + "'/>" );
+                        document.write("<input type='hidden' name='selectedDocument' id='#selectedDocument' value='" + selectedDocument + "'/>" );
+                        document.write("<input type='hidden' name='wordList' id='#wordList' value='" + wordList + "'/>" );
+
                     </script>
                 </select>
             </form>

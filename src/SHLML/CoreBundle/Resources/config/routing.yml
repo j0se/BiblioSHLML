@@ -6,21 +6,18 @@ upload:
     path:     /upload
     defaults: { _controller: SHLMLCoreBundle:Document:upload }
 
-search:
-    path: /search/{term}
-    defaults: {_controller: SHLMLCoreBundle:Document:search}
 
 blog_index:
     path: /index
-    defaults: {_controller: SHLMLCoreBundle:SearchDocument:index}
+    defaults: {_controller: SHLMLCoreBundle:Document:index}
 
 multipleSearch_page:
     path: /multiple_search
-    defaults: {_controller: SHLMLCoreBundle:SearchDocument:multipleSearchPage}
+    defaults: {_controller: SHLMLCoreBundle:Document:multipleSearchPage}
 
 singleSearch_page:
     path: /single_search
-    defaults: {_controller: SHLMLCoreBundle:SearchDocument:singleSearchPage}
+    defaults: {_controller: SHLMLCoreBundle:Document:singleSearchPage}
 
 search:
     path:     /search/{term}

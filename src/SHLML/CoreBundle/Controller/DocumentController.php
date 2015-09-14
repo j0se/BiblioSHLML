@@ -5,9 +5,165 @@ namespace SHLML\CoreBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use SHLML\CoreBundle\Form\DocumentType;
 use SHLML\CoreBundle\Entity\Document;
+use Symfony\Component\HttpFoundation\Request;
 
 class DocumentController extends Controller
 {
+
+    /*
+     *@term
+     */
+    public function searchWithElasticSearch($term){
+
+        function auto_fuzzy($term){
+            if (strlen($term)<=3) $fuzzy_int=0;
+            elseif (strlen($term)<=5) $fuzzy_int=1;
+            elseif (strlen($term)<=8) $fuzzy_int=2;
+            elseif (strlen($term)<=12) $fuzzy_int=3;
+            else $fuzzy_int=4;
+            return $fuzzy_int;
+        }
+        //$term ="le patriote de la meurthe";
+
+        $finder = $this->container->get('fos_elastica.finder.shlml.word');
+        $terms = explode(" ",$term);
+        $found = array();
+
+        for($i=0;$i<sizeof($terms);$i++){
+            $query = new \Elastica\Query\Fuzzy();
+            $query->setField("content",$terms[$i]);
+            $fuzzy_int = auto_fuzzy($terms[$i]);
+            $query->setFieldOption("fuzziness",$fuzzy_int);
+            array_push($found,$finder->find($query));
+        }
+
+        $combinations = array();
+        for($i=0;$i<sizeof($found[0]);$i++){
+            array_push($combinations,$found[0][$i]->getContent());
+        }
+
+        for($i=1;$i<sizeof($found);$i++){
+            $temp = array();
+            for($j=0;$j<sizeof($found[$i]);$j++){
+                for($k=0;$k<sizeof($combinations);$k++){
+                    array_push($temp,$combinations[$k]." ".$found[$i][$j]->getContent());
+                }
+            }
+            $combinations = $temp;
+        }
+
+        $finder = $this->container->get('fos_elastica.finder.shlml.document');
+        $results = array();
+
+        for ($i = 0; $i < sizeof($combinations); $i++) {
+
+            $query = new \Elastica\Query\Match();
+            $query->setFieldQuery('content', $combinations[$i]);
+            $query->setFieldType('content','phrase');
+            $docs = $finder->find($query);
+
+            if ($docs != null) {
+                $results[$combinations[$i]] = array();
+                for ($j = 0; $j < sizeof($docs); $j++) {
+                    if($this->get('security.context')->isGranted('ROLE_USER') || $docs[$j]->getPublic()) {
+                        array_push($results[$combinations[$i]], $docs[$j]->getPath());
+                    }
+                }
+            }
+        }
+        return $results;
+    }
+
+
+    public function indexAction()
+    {
+        return $this->render('SHLMLCoreBundle:SearchDocument:index.html.twig');
+    }
+
+    /*
+     * CHOIX A FAIRE : UTILISER GET POUR PERMETTRE LE PARTAGE D'URL DE RECHERCHE OU UTILISER POST ?
+     */
+
+    public function singleSearchPageAction(Request $request)
+    {
+
+        $selectedDocument = 'document_patriote.pdf';
+        $wordList=array();
+
+        if (isset($_POST['searchedWord'])) {
+            if (isset($_POST['soughtWord'])) {
+                if ($_POST['soughtWord']!=$_POST['searchedWord']){
+                    $searchedWord = $_POST['searchedWord'];
+                    $selectedWord = $_POST['searchedWord'];
+                } else {
+                    $searchedWord = $_POST['searchedWord'];
+                    if (isset($_POST['selectedWord'])) {
+                        $selectedWord = $_POST['selectedWord'];
+                    } else $selectedWord = $searchedWord;
+                }
+            }
+        } else {
+            $searchedWord = "nancy";
+            if (isset($_POST['selectedWord'])) {
+                $selectedWord = $_POST['selectedWord'];
+            } else $selectedWord = $searchedWord;
+        }
+
+        $allDocumentList = \SHLML\CoreBundle\Controller\DocumentController::searchWithElasticSearch($searchedWord);
+        $allWordList=array_keys($allDocumentList);
+
+        foreach ($allWordList as $word){
+            if (in_array($selectedDocument,$allDocumentList[$word])){
+                array_push($wordList,$word);
+            }
+        }
+        if (array_key_exists($selectedWord,$allDocumentList)) {
+            $documentList = $allDocumentList[$selectedWord];
+        }
+        if (!array_key_exists($searchedWord,$allDocumentList)) {
+            array_unshift($wordList,$searchedWord);
+        }
+
+        return $this->render(
+            'SHLMLCoreBundle:SearchDocument:singleSearch.html.twig',
+            array(
+                "searchedWord" => $searchedWord,
+                "selectedWord" => $selectedWord,
+                "selectedDocument" => $selectedDocument,
+                "wordList" => $wordList,
+            )
+        ); //, array('posts' => $posts));
+    }
+
+
+    public function multipleSearchPageAction(Request $request)
+    {
+        if (isset($_POST['searchedWord'])) $searchedWord = $_POST['searchedWord'];
+        else $searchedWord = "nancy";
+
+        if (isset($_POST['selectedWord'])) $selectedWord = $_POST['selectedWord'];
+        else $selectedWord = $searchedWord;
+
+        $allDocumentList = \SHLML\CoreBundle\Controller\DocumentController::searchWithElasticSearch($searchedWord);
+        $wordList=array_keys($allDocumentList);
+
+        if (array_key_exists($selectedWord,$allDocumentList)) {
+            $documentList = $allDocumentList[$selectedWord];
+        } else {
+            $documentList = array("mot_introuvable.pdf");
+        }
+
+        if (!array_key_exists($searchedWord,$allDocumentList)) {
+            array_unshift($wordList,$searchedWord);
+        }
+
+        return $this->render(
+            'SHLMLCoreBundle:SearchDocument:multipleSearch.html.twig',
+            array("searchedWord" => $searchedWord, "selectedWord" => $selectedWord, "wordList" => $wordList, "documentList" => $documentList)
+        ); //, array('posts' => $posts));
+    }
+
+
     public function uploadAction()
     {
         $document = new Document();
@@ -36,74 +192,6 @@ class DocumentController extends Controller
             }
         }
         return($res);
-    }
-    /*
-     *@term
-     */
-    public function searchAction($term){
-        $term ="le patriote de la meurthe";
-
-        $finder = $this->container->get('fos_elastica.finder.shlml.word');
-        $terms = explode(" ",$term);
-        var_dump($terms);
-        $found = array();
-        //var_dump($query);
-
-        for($i=0;$i<sizeof($terms);$i++){
-            $query = new \Elastica\Query\Fuzzy();
-            $query->setField("content",$terms[$i]);
-            $query->setFieldOption("fuzziness",3);
-            array_push($found,$finder->find($query));
-        }
-
-        //var_dump($found);
-
-        $combinations = array();
-        for($i=0;$i<sizeof($found[0]);$i++){
-            array_push($combinations,$found[0][$i]->getContent());
-        }
-
-        for($i=1;$i<sizeof($found);$i++){
-            $temp = array();
-            for($j=0;$j<sizeof($found[$i]);$j++){
-                for($k=0;$k<sizeof($combinations);$k++){
-                    array_push($temp,$combinations[$k]." ".$found[$i][$j]->getContent());
-                }
-            }
-            $combinations = $temp;
-        }
-        //var_dump($combinations);
-
-
-        $finder = $this->container->get('fos_elastica.finder.shlml.document');
-        $results = array();
-
-        for ($i = 0; $i < sizeof($combinations); $i++) {
-
-            $query = new \Elastica\Query\Match();
-            $query->setFieldQuery('content', $combinations[$i]);
-            $query->setFieldType('content','phrase');
-
-
-            $docs = $finder->find($query);
-
-            if ($docs != null) {
-                $results[$combinations[$i]] = array();
-                for ($j = 0; $j < sizeof($docs); $j++) {
-                    if($this->get('security.context')->isGranted('ROLE_USER') || $docs[$j]->getPublic()) {
-                        array_push($results[$combinations[$i]], $docs[$j]->getPath());
-                    }
-                }
-            }
-        }
-
-        var_dump($results);
-        $documents = $finder->find($query);
-
-
-        // var_dump($query);
-        //var_dump($documents);
-        return $results;
     }
 
 
