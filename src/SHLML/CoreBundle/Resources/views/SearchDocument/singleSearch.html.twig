@@ -10,9 +10,10 @@
             var selectedWord ='{{ selectedWord }}';
             var wordList = {{ wordList|json_encode|raw }};
             var selectedDocument = '{{ selectedDocument }}';
+            var j= {{ selectedIndex }};
 
             var path = "http://localhost/BiblioSHLML/web/pdf/";
-            var j=wordList.indexOf(selectedWord);
+
             var viewerElement;
             var myWebViewer;
 

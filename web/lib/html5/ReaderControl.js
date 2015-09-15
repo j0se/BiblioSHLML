@@ -1,9 +1,9 @@
 /*global Modernizr */
 (function(exports) {
     "use strict";
-    
+
     exports.ReaderControl = exports.ReaderControl || {};
-    
+
     var Text = XODText;
     var ToolMode = exports.PDFTron.WebViewer.ToolMode;
 
@@ -31,7 +31,7 @@
 
         this.clickedSearchResult = -1;
         this.clickedBookMark = -1;
-        
+
         // Key binding.
         var fKey = 70;
         var leftArrowKey = 37;
@@ -59,7 +59,7 @@
 
         $(exports).keydown(function(e) {
             var ctrlDown = e.metaKey || e.ctrlKey;
-            
+
             // document navigation
             // don't change pages if a text input is currently focused
             var currentPage = me.docViewer.getCurrentPage();
@@ -120,7 +120,7 @@
                     }
                 }
             }
-            
+
         });
 
         var $viewerElement = $('#DocumentViewer');
@@ -142,7 +142,7 @@
                 // don't need to scroll between pages if we're in continuous mode
                 return;
             }
-            
+
             if (delta < 0) {
                 // // scrolling down
                 scrollPage(1);
@@ -151,7 +151,7 @@
                 scrollPage(-1);
             }
         });
-        
+
         var scrollPage = function(change, manualScroll) {
             var pageNum;
             var scrollPosition = $viewerElement.scrollTop();
@@ -187,17 +187,17 @@
         var getChangedPageIndex = function(change) {
             var displayMode = me.docViewer.getDisplayModeManager().getDisplayMode();
             var cols = (displayMode.mode === exports.CoreControls.DisplayModes.Single) ? 1 : 2;
-            
+
             var rowNum;
             if (displayMode.mode === exports.CoreControls.DisplayModes.CoverFacing) {
                 rowNum = Math.floor(me.docViewer.getCurrentPage() / cols);
             } else {
                 rowNum = Math.floor((me.docViewer.getCurrentPage() - 1) / cols);
             }
-            
+
             rowNum += change;
             var pageIndex = rowNum * cols;
-            
+
             if (displayMode.mode === exports.CoreControls.DisplayModes.CoverFacing) {
                 if (pageIndex === 0) {
                     return 0;
@@ -214,7 +214,7 @@
                 }
             }
         };
-        
+
         var setZoomLevelWithBounds = function(zoom) {
             if (zoom <= me.MIN_ZOOM) {
                 zoom = me.MIN_ZOOM;
@@ -227,16 +227,16 @@
         this.$thumbnailViewContainer = $("#thumbnailView");
         this.$thumbnailViewContainer.scroll(function() {
             clearTimeout(me.thumbnailRenderTimeout);
-       
+
             me.thumbnailRenderTimeout = setTimeout(function () {
                 me.updateThumbnailView();
             }, 80);
         });
-        
+
         $('#lastPage').bind('click', function() {
             me.docViewer.displayLastPage();
         });
-        
+
         $('#zoomBox').keyup(function(e) {
             if (e.which === 13) {
                 var input = this.value;
@@ -259,7 +259,7 @@
             }
             setZoomLevelWithBounds(zoom);
         });
-        
+
         $("#zoomIn").click(function() {
             var zoom = me.getZoomLevel();
             if (zoom < 1.0 && (zoom + 0.25) > 1.0) {
@@ -269,10 +269,10 @@
             }
             setZoomLevelWithBounds(zoom);
         });
-        
+
         me.docViewer.on('zoomUpdated', function(e, zoom) {
             var zoomVal = Math.round(zoom * 100);
-            
+
             $('#zoomBox').val(zoomVal + "%");
             if ($("#slider").slider("value") !== zoomVal) {
                 $("#slider").slider({
@@ -281,9 +281,9 @@
             }
             me.fireEvent('zoomChanged', [zoom]);
         });
-        
+
         me.resize();
-        
+
         $(window).resize(function(e) {
             if (e && e.target !== window) {
                 return;
@@ -295,7 +295,7 @@
             }
             $("#thumbnailView").trigger('scroll');
         });
-        
+
         $("#slider").slider({
             slide: function(event, ui) {
                 var number = parseInt(ui.value, 10);
@@ -309,7 +309,7 @@
                 }
             }
         });
-        
+
         $('#pageNumberBox').keyup(function(e) {
             // check for the enter key
             if (e.which === 13) {
@@ -329,7 +329,7 @@
                 me.setLayoutMode(exports.CoreControls.DisplayModes.Single);
             }
         });
-        
+
         me.docViewer.on('toolModeUpdated', function(e, newToolMode, oldToolMode) {
             me.fireEvent('toolModeChanged', [newToolMode, oldToolMode]);
         });
@@ -337,21 +337,21 @@
         me.docViewer.on('pageNumberUpdated', function(e, pageNumber) {
             $('#pageNumberBox').val(pageNumber);
             var pageIndex = pageNumber - 1;
-            
+
             if (me.clickedThumb !== -1) {
                 $("#thumbContainer" + me.clickedThumb).removeClass('ui-state-active');
             }
-            
+
             var $selectedThumbContainer = $("#thumbContainer" + pageIndex);
             if (typeof me.thumbnailsElement !== 'undefined') {
                 //thumbnail control viewport
                 var viewportTop = me.thumbnailsElement.scrollTop;
                 var viewportHeight = me.thumbnailsElement.offsetHeight;
                 var viewportBottom = viewportTop + viewportHeight;
-                
+
                 //absolute height of thumbnail containers (including border/padding/margin)
                 var thumbContainerHeight = $selectedThumbContainer.outerHeight(true);
-                
+
                 var top = pageIndex * thumbContainerHeight;
                 var bottom = top + thumbContainerHeight;
 
@@ -363,19 +363,19 @@
                     me.thumbnailsElement.scrollTop = top + thumbContainerHeight - viewportHeight;
                 }
             }
-            
+
             me.clickedThumb = pageIndex;
             $selectedThumbContainer.addClass('ui-state-active');
             me.fireEvent('pageChanged',[pageNumber]);
         });
-        
+
         $("#layoutModeDropDown .content").on('click', 'li', function() {
             var layoutModeVal = $(this).data('layout-mode');
             if (layoutModeVal) {
                 me.setLayoutMode(layoutModeVal);
             }
         });
-        
+
         $("#rotateGroup").on('click', '[data-rotate]', function() {
             var action = $(this).data('rotate');
             if (action === "cc") {
@@ -384,7 +384,7 @@
                 me.rotateCounterClockwise();
             }
         });
-        
+
         var drop = new Drop({
             target: document.querySelector('#layoutModeDropDown .drop-target'),
             content: document.querySelector('#layoutModeDropDown .content'),
@@ -395,7 +395,7 @@
                 targetOffset: '10px 0'
             }
         });
-        
+
         drop.once('open', function() {
             me.docViewer.trigger('displayModeUpdated');
 
@@ -416,13 +416,13 @@
         $('#fitWidth').on('click', function() {
             me.docViewer.setFitMode(me.docViewer.FitMode.FitWidth);
         });
-        
+
         $('#fitPage').on('click', function() {
             me.docViewer.setFitMode(me.docViewer.FitMode.FitPage);
         });
 
         $('#fullScreenButton').on('click', function() {
-            var inFullScreenMode = document.fullscreenElement || 
+            var inFullScreenMode = document.fullscreenElement ||
                 document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
 
             if (inFullScreenMode) {
@@ -498,7 +498,7 @@
             }
 
         });
-        
+
         me.docViewer.on('displayModeUpdated', function() {
             var displayMode = me.docViewer.getDisplayModeManager().getDisplayMode();
 
@@ -508,11 +508,11 @@
 
             me.fireEvent('layoutModeChanged', [displayMode]);
         });
-        
+
         me.docViewer.on('fitModeUpdated', function(e, fitMode) {
             var fitWidth = $('#fitWidth');
             var fitPage = $('#fitPage');
-            
+
             if (fitMode === me.docViewer.FitMode.FitWidth) {
                 fitWidth.addClass('active');
                 fitPage.removeClass('active');
@@ -524,10 +524,10 @@
                 fitWidth.removeClass('active');
                 fitPage.removeClass('active');
             }
-            
+
             me.fireEvent('fitModeChanged', [fitMode]);
         });
-        
+
         // //Example of overriding the default link appearance and behavior
         // //==============================================================
         // me.docViewer.on('linkReady', function(e, linkElement, link){
@@ -536,7 +536,7 @@
         //            //external link clicked
         //            window.open(link.getTarget());
         //        };
-    
+
         //    }else if(link instanceof CoreControls.Link) {
         //        linkElement.parentClick = linkElement.onclick;
         //        linkElement.onclick = function(){
@@ -554,7 +554,7 @@
         //    //note that dom elements appended need to have the position:relative style to show up correctly
         //    //also by default, text selection on div elements is disabled
         // });
-        
+
         me.docViewer.on('pageComplete', function(e, pageIndex) {
             me.fireEvent("pageCompleted", [pageIndex + 1]);
         });
@@ -584,7 +584,7 @@
          */
         initUI: function(){
             var me = this;
-        
+
             $("#toggleSidePanel").on('click', function() {
                 me.setShowSideWindow(!me.sidePanelVisible());
             });
@@ -592,16 +592,16 @@
             $('#toggleNotesPanel').on('click', function() {
                 me.showNotesPanel(!me.notesPanelVisible());
             });
-                
+
             $("#slider").slider({
                 min: me.MIN_ZOOM * 100,
                 max: me.MAX_ZOOM * 100,
                 value: 100,
                 animate: true
             });
-            
+
             $('#optionsMenuList').hide().menu();
-            
+
             context.init({
                 compress: true
             });
@@ -610,7 +610,7 @@
             $.widget( "ui.tabs", $.ui.tabs, {
                 updateHeight: function($panels) {
                     //if panel index is provided, only update height that panel
-                    
+
 //                    var $panels =  $("#tabs .ui-tabs-panel");
 //                    if(typeof index !== 'undefined'){
 //                        $panels = $($panels[index]);
@@ -665,7 +665,7 @@
                     this._trigger('afterUpdateHeight');
                 }
             });
-            
+
             var $tabs = $("#tabs");
             $tabs.tabs({
                 cache: true,
@@ -713,22 +713,22 @@
                 $('#toggleNotesPanel').parent().hide();
                 $('#notesPanelWrapper').hide();
             }
-            
+
             if (!Modernizr.fullscreen) {
                 $("#fullScreenButton").hide();
             }
-            
+
             if (ReaderControl.config.ui.hidePrint) {
                 $('#printButton').hide();
             }
 
             if (!ReaderControl.config.ui.hideControlBar) {
                 //$("#control").show();
-                
+
                 if (ReaderControl.config.ui.hideDisplayModes) {
                     document.getElementById('displayModes').parentNode.style.visibility = 'hidden';
                 }
-                
+
                 if (ReaderControl.config.ui.hideTextSearch) {
                     $('#searchControl').parent().hide();
                 }
@@ -736,7 +736,7 @@
                     $('#zoomBox').parent().hide();
                 }
             }
-            
+
             // always initially hide the panel itself
             $("#sidePanel").hide();
 
@@ -770,8 +770,8 @@
             $('<label>').attr({
                 'for': 'passwordInput'
             })
-            .text(userMessage)
-            .appendTo(errorDialog);
+                .text(userMessage)
+                .appendTo(errorDialog);
 
             errorDialog.dialog({
                 modal: true,
@@ -816,7 +816,7 @@
 
             addToolOptions({
                 'contextMenu.pan': this.toolModeMap[ToolMode.Pan],
-               // 'contextMenu.textSelect': this.toolModeMap[ToolMode.TextSelect]
+                // 'contextMenu.textSelect': this.toolModeMap[ToolMode.TextSelect]
             });
 
             if (this.enableAnnotations && !readonly) {
@@ -833,7 +833,7 @@
 
             context.attach('#DocumentViewer', contextArray);
             context.getElement().i18n();
-		
+
         },
 
         getViewerHeight: function(){
@@ -847,16 +847,16 @@
         resize: function(){
             //find the height of the internal page
             var scrollContainer = document.getElementById('DocumentViewer');
-            
+
             //change the height of the viewer element
             var viewerHeight = this.getViewerHeight();
             $(scrollContainer).height(viewerHeight);
             scrollContainer.width = window.innerWidth;
 
-  
+
             $('#tabs').tabs("updateHeight");
         },
-        
+
         onDocumentLoaded: function() {
             if(this.hasBeenClosed) {
                 this.closeDocument();
@@ -865,9 +865,9 @@
             exports.BaseReaderControl.prototype.onDocumentLoaded.call(this);
             var me = this;
             var loaded = me.eventsBound;
-            
+
             me.clearSidePanelData();
-           
+
             if (!loaded && !ReaderControl.config.ui.hideSidePanel) {
                 me.setShowSideWindow(true, false);
             }
@@ -876,13 +876,13 @@
             me.initThumbnailView();
             me.initSearchView();
             me.setInterfaceDefaults();
-            
+
             if (!loaded) {
                 me.eventsBound = true;
-                
+
                 me.bindEvents();
             }
-            
+
             //// Programmatically create a rectangle
             ////----------------------------------------------
             //var am = me.docViewer.getAnnotationManager();
@@ -926,14 +926,14 @@
             am.on('annotationPopupDeleted', function(e, annotation, $popupel, $textarea) {
                 $textarea.flexible('remove');
             });
-            
+
             //make it easier to select annotations
             //Annotations.SelectionModel.selectionAccuracyPadding = 1;
             Annotations.SelectionAlgorithm.canvasVisibilityPadding = 10;
-            
+
             me.fireEvent('documentLoaded');
         },
-        
+
         offlineReady: function() {
             var container = $('<div>').addClass('group');
             $('#control .right-aligned').prepend(container);
@@ -943,51 +943,51 @@
                 'class': 'glyphicons download',
                 'data-i18n': '[title]offline.downloadOfflineViewing'
             })
-            .data('downloading', false)
-            .appendTo(container)
-            .i18n();
+                .data('downloading', false)
+                .appendTo(container)
+                .i18n();
 
             $('<span>').attr({
                 'id': 'toggleOfflineButton',
                 'class': 'glyphicons cloud_minus',
                 'data-i18n': '[title]offline.enableOffline'
             })
-            .appendTo(container)
-            .i18n();
-            
+                .appendTo(container)
+                .i18n();
+
             var doc = this.docViewer.getDocument();
-            
+
             $('#offlineDownloadButton').click(function() {
                 var $this = $(this);
-            
+
                 var isDownloading = $this.data("downloading");
-            
+
                 if (isDownloading) {
                     // allow cancelling while the download is happening
                     $this.data("downloading", false);
                     doc.cancelOfflineModeDownload();
                 } else {
                     $this.data("downloading", true);
-                    
+
                     doc.storeOffline(function() {
                         $this.data("downloading", false);
-                        
+
                         $this.removeClass('circle_remove').addClass('download');
 
                         if (doc.isDownloaded()) {
                             $('#toggleOfflineButton').removeClass('disabled');
                         }
-                        
+
                         $this.attr('data-i18n', '[title]offline.downloadOfflineViewing').i18n();
                     });
-                    
+
                     // switch to the cancel icon while the download is going on
                     $this.removeClass('download').addClass('circle_remove');
 
                     $this.attr('data-i18n', '[title]offline.cancelDownload').i18n();
                 }
             });
-            
+
             $('#toggleOfflineButton').click(function() {
                 if ($(this).hasClass('disabled')) {
                     return false;
@@ -1010,7 +1010,7 @@
                     button.removeClass('active');
                 }
             }
-            
+
             if (doc.getOfflineModeEnabled()) {
                 toggleOfflineButtonText(true);
             }
@@ -1019,19 +1019,19 @@
                 $('#toggleOfflineButton').addClass('disabled');
             }
         },
-        
+
         updateAnnotations: function() {
             if (this.serverUrl === null) {
                 console.warn("Server URL was not specified.");
                 return;
             }
-            
+
             var am = this.docViewer.getAnnotationManager();
             var saveAnnotUrl = this.serverUrl;
             if (this.docId !== null) {
                 saveAnnotUrl += "?did=" + this.docId;
             }
-            
+
             var command = am.getAnnotCommand();
             $.ajax({
                 type: 'POST',
@@ -1049,18 +1049,18 @@
                 dataType: 'xml'
             });
         },
-        
+
         saveAnnotations: function() {
             //---------------------------
             // Save annotations
             //---------------------------
             // You'll need server-side communication here
-            
+
             // 1) local saving
             //var xfdfString = this.docViewer.getAnnotationManager().exportAnnotations();
             //var uriContent = "data:text/xml," + encodeURIComponent(xfdfString);
             //newWindow = window.open(uriContent, 'XFDF Document');
-            
+
             // 2) saving to server (simple)
             var overlayMessage;
 
@@ -1069,7 +1069,7 @@
                     overlayMessage = $('#overlayMessage');
                     overlayMessage.attr('data-i18n', 'annotations.savingAnnotations');
                     overlayMessage.i18n();
-                    
+
                     overlayMessage.dialog({
                         dialogClass: 'no-title',
                         draggable: false,
@@ -1091,24 +1091,24 @@
                     //Annotations were sucessfully uploaded to server
                     overlayMessage.attr('data-i18n', 'annotations.saveSuccess');
                     overlayMessage.i18n();
-                }, 
+                },
                 error: function(jqXHR, textStatus, errorThrown) {
                     /*jshint unused:false */
                     console.warn("Failed to send annotations to server.");
                     overlayMessage.attr('data-i18n', 'annotations.saveError');
                     overlayMessage.i18n();
-                }, 
+                },
                 complete: function() {
                     setTimeout(function() {
                         overlayMessage.dialog('close');
                     }, 1000);
                 }
             });
-            
+
             // 3) saving to server (avoid conflicts)
             // NOT IMPLEMENTED
         },
-        
+
         initBookmarkView: function() {
             var me = this;
             var doc = this.docViewer.getDocument();
@@ -1123,14 +1123,14 @@
                 .off("mouseleave").on("mouseleave", "div.bookmarkWrapper", function() {
                     $(this).removeClass("ui-state-hover");
                 });
-            
+
             function displayBookmarks(bookmarks, currentNode, id) {
                 /*jshint loopfunc:true */
                 for (var i = 0; i < bookmarks.length; i++) {
                     var node = document.createElement('span');
                     node.id = "bookmark" + id;
                     node.innerHTML = bookmarks[i].getName();
-                    
+
                     var newNode;
                     if (bookmarks[i].getChildren().length > 0) {
                         newNode = $("<li class=\"closed\"></li>");
@@ -1142,49 +1142,49 @@
                     var otherNode = $(node);
                     var wrapper = $("<div class='bookmarkWrapper' id=bookmarkWrapper" + id + "></div>");
                     newNode.append(wrapper.append(otherNode));
-                    
+
                     wrapper.data('data', {
                         bookmark: bookmarks[i],
                         id: id++
                     })
-                    .click(function() {
-                        if (me.clickedBookmark !== -1) {
-                            $("#bookmarkWrapper" + me.clickedBookmark).removeClass('ui-state-active');
-                            me.clickedBookmark = -1;
-                        }
-                        me.clickedBookmark = $(this).data("data").id;
-                        $(this).addClass('ui-state-active');
-                        
-                        me.docViewer.displayBookmark($(this).data("data").bookmark);
-                    });
-                    
+                        .click(function() {
+                            if (me.clickedBookmark !== -1) {
+                                $("#bookmarkWrapper" + me.clickedBookmark).removeClass('ui-state-active');
+                                me.clickedBookmark = -1;
+                            }
+                            me.clickedBookmark = $(this).data("data").id;
+                            $(this).addClass('ui-state-active');
+
+                            me.docViewer.displayBookmark($(this).data("data").bookmark);
+                        });
+
                     currentNode.append(newNode);
 
                     if (bookmarks[i].getChildren().length > 0) {
                         var $list = $("<ul></ul>");
                         newNode.append($list);
-                        
+
                         id = displayBookmarks(bookmarks[i].getChildren(), $list, id);
                     }
                 }
-                
+
                 if (i === 0) {
                     $("#bookmarkView").append('<div style="padding:5px 3px;" data-i18n="sidepanel.outlineTab.noOutlines"></div>');
                     $("#bookmarkView").i18n();
                 }
-                
+
                 return id;
             }
             $("#bookmarkView").treeview();
         },
-        
+
         initThumbnailView: function() {
             /*jshint loopfunc: true */
             var me = this;
             me.requestedThumbs = {};
             me.lastRequestedThumbs = [];
             var nPages = this.docViewer.getPageCount();
-            
+
             //delegate event
             $("#thumbnailView")
                 .off("mouseenter").on("mouseenter", "div.ui-widget-content", function() {
@@ -1198,7 +1198,7 @@
             this.thumbnailsElement = this.$thumbnailViewContainer.get(0);
 
             for (var pageIndex = 0; pageIndex < nPages; pageIndex++) {
-                
+
                 var thumbContainer = document.createElement('div');
                 thumbContainer.id = "thumbContainer" + pageIndex;
                 thumbContainer.style.height = me.thumbContainerHeight + "px";
@@ -1218,11 +1218,11 @@
                 div.style.textAlign = "center";
                 div.innerHTML = pageIndex + 1;
                 thumbContainer.appendChild(div);
-                
+
                 (function(pageIndex) {
                     thumbContainer.addEventListener('click', function() {
                         var $this = $(this);
-                    
+
                         if (me.clickedThumb !== -1) {
                             $("#thumbContainer" + me.clickedThumb).removeClass('ui-state-active');
                         }
@@ -1240,10 +1240,10 @@
             }
 
             // add all thumbnails to DOM at once
-            
-            
+
+
         },
-        
+
         initSearchView: function() {
             //delegate event
             $("#fullSearchView")
@@ -1328,7 +1328,7 @@
 
             $thumbContainer.prepend(pad);
         },
-        
+
         appendThumbs: function(visibleThumbs) {
             /*jshint loopfunc: true */
             var me = this;
@@ -1337,14 +1337,14 @@
                 return;
             }
             var doc = this.docViewer.getDocument();
-            
+
             for (var i = 0; i < visibleThumbs.length; i++) {
                 (function() {
                     var pageIndex = visibleThumbs[i];
                     if (me.requestedThumbs[pageIndex] || $('#thumbContainer' + pageIndex).find('.thumb').length > 0) {
                         return;
                     }
-                    
+
                     var requestId = doc.loadThumbnailAsync(pageIndex, function(thumb) {
                         me.receivedThumb(thumb, pageIndex);
                     });
@@ -1352,7 +1352,7 @@
                 })();
             }
         },
-        
+
         getVisibleThumbs: function () {
             if (this.docViewer.getDocument() === null) {
                 return [];
@@ -1366,7 +1366,7 @@
             }
             var scrollTop = this.thumbnailsElement.scrollTop;
             var scrollBottom = scrollTop + thumbViewContainerHeight;
-            
+
             var topVisiblePageIndex =  Math.floor(scrollTop / thumbItemHeight);
             var bottomVisiblePageIndex = Math.ceil(scrollBottom / thumbItemHeight) - 1;
             var totalVisiblePages = bottomVisiblePageIndex - topVisiblePageIndex  + 1;
@@ -1381,13 +1381,13 @@
             if (bottomVisibleWithCache >= nPages) {
                 bottomVisibleWithCache = (nPages - 1);
             }
-            
+
             for (var i = topVisibleWithCache; i <= bottomVisibleWithCache; i++ ) {
                 thumbIndexes.push(i);
             }
             return thumbIndexes;
         },
-        
+
         sidePanelVisible: function() {
             return !!this._showSideWindow;
         },
@@ -1428,35 +1428,35 @@
             $('#bookmarkView').empty();
             $('#thumbnailView').empty();
         },
-        
+
         searchText: function(pattern, mode) {
             var me = this;
-           // if (pattern !== '') {
-                mode = mode | me.docViewer.SearchMode.e_page_stop | me.docViewer.SearchMode.e_highlight;
-                me.docViewer.textSearchInit(pattern, mode, false);
+            // if (pattern !== '') {
+            mode = mode | me.docViewer.SearchMode.e_page_stop | me.docViewer.SearchMode.e_highlight | me.docViewer.SearchMode.e_whole_word;
+            me.docViewer.textSearchInit(pattern, mode, false);
             //}
         },
-        
+
         fullTextSearch: function(pattern) {
             var pageResults = [];
-            
+
             $('#fullSearchView').empty();
             var me = this;
             var searchResultLineId = 0;
-			var word = "";
+            var word = "";
             if (pattern !== '') {
-                var mode = me.docViewer.SearchMode.e_page_stop | me.docViewer.SearchMode.e_ambient_string | me.docViewer.SearchMode.e_highlight;
-               /* if (bool!="false") {
-                    mode = mode | me.docViewer.SearchMode.e_whole_word;
-                }*/
+                var mode = me.docViewer.SearchMode.e_page_stop | me.docViewer.SearchMode.e_ambient_string | me.docViewer.SearchMode.e_highlight | me.docViewer.SearchMode.e_whole_word;
+                //if (bool!="false") {
+
+                //
                 me.docViewer.textSearchInit(pattern, mode, true,
                     // onSearchCallback
                     function(result) {
                         if (result.resultCode === Text.ResultCode.e_found){
-							if (word != result.ambient_str.slice(result.result_str_start, result.result_str_end).toLowerCase()){
-								$('#fullSearchView').append("<div> <span style='color:#FF0000;font-weight:bold;font-style:italic;'>Resultat pour : \""+ result.ambient_str.slice(result.result_str_start, result.result_str_end) +"\"</span> </div>");
-								word = result.ambient_str.slice(result.result_str_start, result.result_str_end).toLowerCase();
-							}
+                            if (word != result.ambient_str.slice(result.result_str_start, result.result_str_end).toLowerCase()){
+                                $('#fullSearchView').append("<div> <span style='color:#FF0000;font-weight:bold;font-style:italic;'>Resultat pour : \""+ result.ambient_str.slice(result.result_str_start, result.result_str_end) +"\"</span> </div>");
+                                word = result.ambient_str.slice(result.result_str_start, result.result_str_end).toLowerCase();
+                            }
                             pageResults.push(result.page_num);
                             var $resultLine = $("<div id=\"searchResultLine" + searchResultLineId + "\">").addClass("searchResultLine ui-widget-content");
                             $('<span>').text(result.ambient_str.slice(0, result.result_str_start)).appendTo($resultLine);
@@ -1467,17 +1467,17 @@
                                 quads: result.quads,
                                 searchResultLineId: searchResultLineId++
                             })
-                            .click(function() {
-                                if (me.clickedSearchResult !== -1) {
-                                    $("#searchResultLine" + me.clickedSearchResult).removeClass('ui-state-active');
-                                    me.clickedSearchResult = -1;
-                                }
-                                me.clickedSearchResult = $(this).data("data").searchResultLineId;
-                     
-                                $(this).addClass('ui-state-active');
-								me.docViewer.setTextHighlightColor('rgba(255, 0, 0, 0.6)');
-                                me.docViewer.displaySearchResult($(this).data("data").result);
-                            }).appendTo($("#fullSearchView"));
+                                .click(function() {
+                                    if (me.clickedSearchResult !== -1) {
+                                        $("#searchResultLine" + me.clickedSearchResult).removeClass('ui-state-active');
+                                        me.clickedSearchResult = -1;
+                                    }
+                                    me.clickedSearchResult = $(this).data("data").searchResultLineId;
+
+                                    $(this).addClass('ui-state-active');
+                                    me.docViewer.setTextHighlightColor('rgba(255, 0, 0, 0.6)');
+                                    me.docViewer.displaySearchResult($(this).data("data").result);
+                                }).appendTo($("#fullSearchView"));
                             if (searchResultLineId === 1) {
                                 $resultLine.click();
                             }
@@ -1488,36 +1488,36 @@
                                 $fullSearchView.append("<div data-i18n='sidepanel.searchTab.noResults'></div>");
                                 $fullSearchView.i18n();
                             } else {
-								$fullSearchView.append("<div> Fin de recherche </div>");
-							}
+                                $fullSearchView.append("<div> Fin de recherche </div>");
+                            }
                         }
-            			});
+                    });
             }
-			
+
         },
-        
+
         bindEvents: function() {
             var me = this;
-       
+
             $('#prevPage').on('click', function() {
                 var currentPage = me.docViewer.getCurrentPage();
                 if (currentPage > 1) {
                     me.docViewer.setCurrentPage(currentPage - 1);
                 }
             });
-        
+
             $('#nextPage').on('click', function() {
                 var currentPage = me.docViewer.getCurrentPage();
                 if (currentPage <= me.docViewer.getPageCount()) {
                     me.docViewer.setCurrentPage(currentPage + 1);
                 }
             });
-           
+
             $('#searchButton').on('click', function() {
                 me.searchText($('#searchBox').val());
             });
-        
-            $('#searchBox').on('keypress', function(e) {                
+
+            $('#searchBox').on('keypress', function(e) {
                 if (e.which === 13) { //Enter keycode
                     var searchTerm = $(this).val();
 
@@ -1528,12 +1528,12 @@
                     }
                 }
             });
-            
+
             // Side Panel events
             $('#fullSearchButton').on('click', function() {
                 me.fullTextSearch($('#fullSearchBox').val());
             });
-        
+
             $('#fullSearchBox').on('keypress', function(e) {
                 if(e.which === 13) { //Enter keycode
                     me.fullTextSearch($(this).val());
@@ -1542,7 +1542,7 @@
 
             me.bindPrintEvents();
         },
-        
+
         fireEvent: function(type, data) {
             $(document).trigger(type, data);
         },
@@ -1643,8 +1643,8 @@
                         }, function() {}, 1);
                     }
                 };
-            
-            
+
+
                 var pagesToPrint = getPagesToPrint();
                 if (pagesToPrint.length === 0) {
                     alert("No valid pages specified");
@@ -1702,21 +1702,21 @@
                     'value': pageNum / totalPages * 100
                 });
                 progressLabel.show().attr('data-i18n', 'print.preparingPages')
-                .data('i18n-options', {
-                    "current": pageNum,
-                    "total": totalPages
-                })
-                .i18n();
+                    .data('i18n-options', {
+                        "current": pageNum,
+                        "total": totalPages
+                    })
+                    .i18n();
             });
         },
 
         getPageContainer: function(pageIndex) {
             return $('#DocumentViewer').find('#pageContainer' + pageIndex);
         },
-        
+
         setInterfaceDefaults: function() {
             var pageIndex = this.docViewer.getCurrentPage() - 1;
-            
+
             $('#totalPages').text('/' + this.docViewer.getPageCount());
             var zoom = Math.round(this.docViewer.getZoom() * 100);
             $('#zoomBox').val(zoom + "%");
@@ -1733,14 +1733,14 @@
         setVisibleTab: function(index) {
             $("#tabs").tabs("option", "active", index);
         },
-        
+
         //==========================================================
         // Implementation of the WebViewer.js interface
         //==========================================================
         getShowSideWindow: function() {
             return !!this._showSideWindow;
         },
-        
+
         setShowSideWindow: function(value, animate) {
             if (_.isUndefined(animate)) {
                 animate = true;
@@ -1789,7 +1789,7 @@
                 $notesPanel.addClass('hidden');
                 $toggleNotesButton.removeClass('active');
             }
-            
+
             this.shiftSidePanel();
             setTimeout(function(){
                 me.docViewer.scrollViewUpdated();
@@ -1842,7 +1842,7 @@
             var newDisplayMode = new exports.CoreControls.DisplayMode(this.docViewer, layoutMode);
             this.docViewer.getDisplayModeManager().setDisplayMode(newDisplayMode);
         },
-        
+
 
         closeDocument: function() {
             exports.BaseReaderControl.prototype.closeDocument.call(this);
@@ -1867,61 +1867,61 @@
     };
 
     exports.ReaderControl.prototype = $.extend({}, exports.BaseReaderControl.prototype, exports.ReaderControl.prototype);
-    
-
-    
-/* ReaderControl event doclet */
-
-/**
- * A global DOM event that is triggered when the viewer has been loaded and ReaderControl is constructed.
- * @name ReaderControl#viewerLoaded
- * @event
- * @param e a JavaScript event object
- */
-
-/**
- * A global DOM event that is triggered when a document has been loaded.
- * @name ReaderControl#documentLoaded
- * @event
- * @param e a JavaScript event object
- */
- 
-/** A global DOM event that is triggered when the document view's zoom level has changed.
- * @name ReaderControl#zoomChanged
- * @event
- * @param e a JavaScript event object
- * @param {number} zoom the new zoom level value
- */
 
 
 
-/** A global DOM event that is triggered when the current page number has changed.
- * @name ReaderControl#pageChanged
- * @event
- * @param e a JavaScript event object
- * @param {integer} pageNumber the new 1-based page number
- */
+    /* ReaderControl event doclet */
 
-/** A global DOM event that is triggered when the display mode has changed
- * @name ReaderControl#layoutModeChanged
- * @event
- * @param e a JavaScript event object
- * @param {object} toolMode the new display mode
- */
+    /**
+     * A global DOM event that is triggered when the viewer has been loaded and ReaderControl is constructed.
+     * @name ReaderControl#viewerLoaded
+     * @event
+     * @param e a JavaScript event object
+     */
 
-/** A global DOM event that is triggered when the fit mode has changed
- * @name ReaderControl#fitModeChanged
- * @event
- * @param e a JavaScript event object
- * @param {object} toolMode the new fit mode
- */
+    /**
+     * A global DOM event that is triggered when a document has been loaded.
+     * @name ReaderControl#documentLoaded
+     * @event
+     * @param e a JavaScript event object
+     */
 
-/** A global DOM event that is triggered when a page had finished rendering.
- * @name ReaderControl#pageCompleted
- * @event
- * @param e a JavaScript event object
- * @param {integer} pageNumber the 1-based page number that finished rendering
- */
+    /** A global DOM event that is triggered when the document view's zoom level has changed.
+     * @name ReaderControl#zoomChanged
+     * @event
+     * @param e a JavaScript event object
+     * @param {number} zoom the new zoom level value
+     */
+
+
+
+    /** A global DOM event that is triggered when the current page number has changed.
+     * @name ReaderControl#pageChanged
+     * @event
+     * @param e a JavaScript event object
+     * @param {integer} pageNumber the new 1-based page number
+     */
+
+    /** A global DOM event that is triggered when the display mode has changed
+     * @name ReaderControl#layoutModeChanged
+     * @event
+     * @param e a JavaScript event object
+     * @param {object} toolMode the new display mode
+     */
+
+    /** A global DOM event that is triggered when the fit mode has changed
+     * @name ReaderControl#fitModeChanged
+     * @event
+     * @param e a JavaScript event object
+     * @param {object} toolMode the new fit mode
+     */
+
+    /** A global DOM event that is triggered when a page had finished rendering.
+     * @name ReaderControl#pageCompleted
+     * @event
+     * @param e a JavaScript event object
+     * @param {integer} pageNumber the 1-based page number that finished rendering
+     */
 })(window);
 
 $(function() {

@@ -11,13 +11,10 @@
             var wordList = {{ wordList|json_encode|raw }};
             var documentList = {{ documentList|json_encode|raw }};
 
-            console.log(searchedWord);
-            console.log(selectedWord);
-
             var path = "http://localhost/BiblioSHLML/web/pdf/";
 
             var i=0, currentLoad = documentList[i];
-            var j=wordList.indexOf(selectedWord), currentWord = selectedWord;
+            var j= {{ selectedIndex }}, currentWord = selectedWord;
 
             var viewerElement;
             var myWebViewer;
@@ -26,6 +23,7 @@
                 document.getElementById('#searchedWord').value=searchedWord;
                 document.getElementById('#selectedWord').value=selectedWord;
                 SelectWord.selectedIndex=j;
+
 
                 viewerElement = document.getElementById('viewer');
                 myWebViewer = new PDFTron.WebViewer({

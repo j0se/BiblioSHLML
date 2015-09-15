@@ -2,6 +2,7 @@
 
 namespace SHLML\CoreBundle\Controller;
 
+use Elastica\Transport\Null;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use SHLML\CoreBundle\Form\DocumentType;
 use SHLML\CoreBundle\Entity\Document;
@@ -13,20 +14,35 @@ class DocumentController extends Controller
     /*
      *@term
      */
-    public function searchWithElasticSearch($term){
+    public function searchWithElasticSearch($term, $selectedDocument=NULL){
 
         function auto_fuzzy($term){
-            if (strlen($term)<=3) $fuzzy_int=0;
-            elseif (strlen($term)<=5) $fuzzy_int=1;
+            if (strlen($term)<=5) $fuzzy_int=1;
             elseif (strlen($term)<=8) $fuzzy_int=2;
-            elseif (strlen($term)<=12) $fuzzy_int=3;
-            else $fuzzy_int=4;
+            elseif (strlen($term)<=11) $fuzzy_int=3;
+            elseif (strlen($term)<=14) $fuzzy_int=4;
+            else $fuzzy_int=5;
             return $fuzzy_int;
         }
         //$term ="le patriote de la meurthe";
-
+        $terms=array();
         $finder = $this->container->get('fos_elastica.finder.shlml.word');
         $terms = explode(" ",$term);
+
+
+        /*
+        for ($i=0; $i<sizeof($terms_before_handling); $i++) {
+            for ($j = $i; $j < sizeof($terms_before_handling); $j++) {
+                $str = '';
+                for ($k = $i; $k <= $j; $k++) {
+                    $str = $str.$terms_before_handling[$k];
+                }
+                var_dump($str);
+                array_push($terms, $str);
+            }
+        }*/
+
+
         $found = array();
 
         for($i=0;$i<sizeof($terms);$i++){
@@ -71,45 +87,50 @@ class DocumentController extends Controller
                 }
             }
         }
+
+        if ($selectedDocument!=NULL) {
+            foreach ($results as $res) {
+                if (!in_array($selectedDocument, $res)) {
+                    unset($results[key($res)]);
+                }
+            }
+        }
+
         return $results;
     }
-
 
     public function indexAction()
     {
         return $this->render('SHLMLCoreBundle:SearchDocument:index.html.twig');
     }
 
-    /*
-     * CHOIX A FAIRE : UTILISER GET POUR PERMETTRE LE PARTAGE D'URL DE RECHERCHE OU UTILISER POST ?
-     */
 
     public function singleSearchPageAction(Request $request)
     {
 
-        $selectedDocument = 'document_patriote.pdf';
+        $selectedDocument = 'SHLML_WIENER_A_03-part-0.pdf';
         $wordList=array();
 
         if (isset($_POST['searchedWord'])) {
             if (isset($_POST['soughtWord'])) {
                 if ($_POST['soughtWord']!=$_POST['searchedWord']){
-                    $searchedWord = $_POST['searchedWord'];
-                    $selectedWord = $_POST['searchedWord'];
+                    $searchedWord = strtolower($_POST['searchedWord']);
+                    $selectedWord = strtolower($_POST['searchedWord']);
                 } else {
                     $searchedWord = $_POST['searchedWord'];
                     if (isset($_POST['selectedWord'])) {
-                        $selectedWord = $_POST['selectedWord'];
+                        $selectedWord = strtolower($_POST['selectedWord']);
                     } else $selectedWord = $searchedWord;
                 }
             }
         } else {
             $searchedWord = "nancy";
             if (isset($_POST['selectedWord'])) {
-                $selectedWord = $_POST['selectedWord'];
+                $selectedWord = strtolower($_POST['selectedWord']);
             } else $selectedWord = $searchedWord;
         }
 
-        $allDocumentList = \SHLML\CoreBundle\Controller\DocumentController::searchWithElasticSearch($searchedWord);
+        $allDocumentList = \SHLML\CoreBundle\Controller\DocumentController::searchWithElasticSearch($searchedWord,$selectedDocument);
         $allWordList=array_keys($allDocumentList);
 
         foreach ($allWordList as $word){
@@ -124,11 +145,14 @@ class DocumentController extends Controller
             array_unshift($wordList,$searchedWord);
         }
 
+        $selectedIndex = array_search($selectedWord,$wordList);;
+
         return $this->render(
             'SHLMLCoreBundle:SearchDocument:singleSearch.html.twig',
             array(
                 "searchedWord" => $searchedWord,
                 "selectedWord" => $selectedWord,
+                "selectedIndex" => $selectedIndex,
                 "selectedDocument" => $selectedDocument,
                 "wordList" => $wordList,
             )
@@ -138,10 +162,10 @@ class DocumentController extends Controller
 
     public function multipleSearchPageAction(Request $request)
     {
-        if (isset($_POST['searchedWord'])) $searchedWord = $_POST['searchedWord'];
+        if (isset($_POST['searchedWord'])) $searchedWord = strtolower($_POST['searchedWord']);
         else $searchedWord = "nancy";
 
-        if (isset($_POST['selectedWord'])) $selectedWord = $_POST['selectedWord'];
+        if (isset($_POST['selectedWord'])) $selectedWord = strtolower($_POST['selectedWord']);
         else $selectedWord = $searchedWord;
 
         $allDocumentList = \SHLML\CoreBundle\Controller\DocumentController::searchWithElasticSearch($searchedWord);
@@ -157,10 +181,17 @@ class DocumentController extends Controller
             array_unshift($wordList,$searchedWord);
         }
 
+        $selectedIndex = array_search($selectedWord,$wordList);;
+
         return $this->render(
             'SHLMLCoreBundle:SearchDocument:multipleSearch.html.twig',
-            array("searchedWord" => $searchedWord, "selectedWord" => $selectedWord, "wordList" => $wordList, "documentList" => $documentList)
-        ); //, array('posts' => $posts));
+            array(
+                "searchedWord" => $searchedWord,
+                "selectedWord" => $selectedWord,
+                "selectedIndex" => $selectedIndex,
+                "wordList" => $wordList,
+                "documentList" => $documentList)
+        );
     }
 
 
