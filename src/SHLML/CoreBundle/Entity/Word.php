@@ -3,14 +3,12 @@
 namespace SHLML\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Word
  *
  * @ORM\Table()
  * @ORM\Entity(repositoryClass="SHLML\CoreBundle\Repository\WordRepository")
- * @UniqueEntity("content")
  */
 class Word
 {

@@ -42,18 +42,6 @@ class DocumentAdmin extends Admin
         $this->manageFileUpload($document);
     }
 
-    public function postPersist($document){
-        $stripped = preg_replace('/[^[:punct:]]/', '', $document->getContent());
-        $words = explode(" ",$stripped);
-        $em = $this->getDoctrine()->getManager();
-        foreach($words as $word){
-            $w = new Word();
-            $w->setContent($word);
-            $em->persist($w);
-        }
-        $em->flush();
-    }
-
     public function preUpdate($document) {
         $this->manageFileUpload($document);
     }
