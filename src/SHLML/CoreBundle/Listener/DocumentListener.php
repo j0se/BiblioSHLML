@@ -22,7 +22,11 @@ class DocumentListener
         var_dump($entity);
 
         if ($entity instanceof Document) {
+            var_dump(strtolower($entity->getContent()));
             $stripped = preg_replace("#[^a-zA-Z-0-9|é|è|à|ù|û|ê|â|ô|ë|'|\s]#", '', strtolower($entity->getContent()));
+            var_dump(mb_convert_encoding($stripped,'UTF-8'));
+            file_put_contents("C:\wamp\www\test.txt",$stripped,FILE_APPEND );
+
             $words = explode(" ",$stripped);
             foreach($words as $word){
                 if($repository->findByContent($word) == null) {

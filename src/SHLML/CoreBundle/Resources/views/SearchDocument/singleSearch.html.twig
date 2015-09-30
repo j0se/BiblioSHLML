@@ -49,12 +49,12 @@
         <div>
 
             <form id="#form" method="POST" action="single_search">
-                <label> Texte Recherché </label>
+                <label> Texte RecherchÃ© </label>
                 <input name="searchedWord" id="#searchedWord"/>;
                 <input id="#searchButton" type="submit" value="Valider"> </input>
                 <p></p>
 
-                Choisir un mot similaire dans la liste déroulante :
+                Choisir un mot similaire dans la liste dÃ©roulante :
                 <select style="width: 200px" name='SelectWord' id='SelectWord' onChange='changeWord(this.form)'>
                     <script language="javascript">
                         for(var k=0; k<wordList.length; k++){
@@ -73,7 +73,7 @@
                 </select>
             </form>
         </div>
-        <a href="http://localhost/BiblioSHLML/web/app_dev.php/index"> Revenir à la page d'accueil </a>
+        <a href="http://localhost/BiblioSHLML/web/app_dev.php/index"> Revenir Ã  la page d'accueil </a>
         <div id="viewer" style="height: 700px;"/>
 
     {% endblock %}

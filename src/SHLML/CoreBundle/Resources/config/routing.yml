@@ -6,7 +6,6 @@ upload:
     path:     /upload
     defaults: { _controller: SHLMLCoreBundle:Document:upload }
 
-
 blog_index:
     path: /index
     defaults: {_controller: SHLMLCoreBundle:Document:index}

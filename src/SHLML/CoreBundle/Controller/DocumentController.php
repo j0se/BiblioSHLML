@@ -8,8 +8,13 @@ use SHLML\CoreBundle\Form\DocumentType;
 use SHLML\CoreBundle\Entity\Document;
 use Symfony\Component\HttpFoundation\Request;
 
+mb_internal_encoding('UTF-8');
+
+
 class DocumentController extends Controller
 {
+
+
 
     /*
      *@term
@@ -24,40 +29,26 @@ class DocumentController extends Controller
             else $fuzzy_int=5;
             return $fuzzy_int;
         }
-        //$term ="le patriote de la meurthe";
+
         $terms=array();
         $finder = $this->container->get('fos_elastica.finder.shlml.word');
         $terms = explode(" ",$term);
 
 
-        /*
-        for ($i=0; $i<sizeof($terms_before_handling); $i++) {
-            for ($j = $i; $j < sizeof($terms_before_handling); $j++) {
-                $str = '';
-                for ($k = $i; $k <= $j; $k++) {
-                    $str = $str.$terms_before_handling[$k];
-                }
-                var_dump($str);
-                array_push($terms, $str);
-            }
-        }*/
-
-
         $found = array();
-
         for($i=0;$i<sizeof($terms);$i++){
             $query = new \Elastica\Query\Fuzzy();
             $query->setField("content",$terms[$i]);
             $fuzzy_int = auto_fuzzy($terms[$i]);
             $query->setFieldOption("fuzziness",$fuzzy_int);
-            array_push($found,$finder->find($query));
+            $query->setFieldOption("max_expansions",10);
+            array_push($found,$finder->find($query,1000000));
         }
 
         $combinations = array();
         for($i=0;$i<sizeof($found[0]);$i++){
             array_push($combinations,$found[0][$i]->getContent());
         }
-
         for($i=1;$i<sizeof($found);$i++){
             $temp = array();
             for($j=0;$j<sizeof($found[$i]);$j++){
@@ -76,7 +67,7 @@ class DocumentController extends Controller
             $query = new \Elastica\Query\Match();
             $query->setFieldQuery('content', $combinations[$i]);
             $query->setFieldType('content','phrase');
-            $docs = $finder->find($query);
+            $docs = $finder->find($query,1000000);
 
             if ($docs != null) {
                 $results[$combinations[$i]] = array();
@@ -95,14 +86,22 @@ class DocumentController extends Controller
                 }
             }
         }
-
         return $results;
     }
+
+
+
+
 
     public function indexAction()
     {
         return $this->render('SHLMLCoreBundle:SearchDocument:index.html.twig');
     }
+
+
+
+
+
 
 
     public function singleSearchPageAction(Request $request)
@@ -160,16 +159,36 @@ class DocumentController extends Controller
     }
 
 
+
+
+
+
+
+
     public function multipleSearchPageAction(Request $request)
     {
-        if (isset($_POST['searchedWord'])) $searchedWord = strtolower($_POST['searchedWord']);
-        else $searchedWord = "nancy";
+        //var_dump(strtolower($_POST['searchedWord']));
+       //if (isset($_POST['searchedWord'])) $searchedWord = mb_convert_encoding( strtolower($_POST['searchedWord']), "UTF-8");
+        //if (isset($_POST['searchedWord'])) $searchedWord = strtolower($_POST['searchedWord']);
+       if (isset($_POST['searchedWord'])) {
+            if (mb_check_encoding($_POST['searchedWord'],'UTF-8')) $searchedWord = iconv('UTF-8', 'UTF-8', $_POST['searchedWord']);
+            else $searchedWord = iconv('ISO-8859-1', 'UTF-8', $_POST['searchedWord']);
+       } else $searchedWord =  "nancy";
 
-        if (isset($_POST['selectedWord'])) $selectedWord = strtolower($_POST['selectedWord']);
-        else $selectedWord = $searchedWord;
+        if (isset($_POST['selectedWord'])){
+            if (mb_check_encoding($_POST['selectedWord'],'UTF-8')) $selectedWord = iconv('UTF-8', 'UTF-8', $_POST['selectedWord']);
+            else $selectedWord = iconv('ISO-8859-1', 'UTF-8', $_POST['selectedWord']);
+        } else $selectedWord = $searchedWord;
+
 
         $allDocumentList = \SHLML\CoreBundle\Controller\DocumentController::searchWithElasticSearch($searchedWord);
         $wordList=array_keys($allDocumentList);
+
+        /*
+        foreach ($wordList as $word){
+            $word = mb_convert_encoding($word, "UTF-8");
+        }
+        */
 
         if (array_key_exists($selectedWord,$allDocumentList)) {
             $documentList = $allDocumentList[$selectedWord];
@@ -181,7 +200,7 @@ class DocumentController extends Controller
             array_unshift($wordList,$searchedWord);
         }
 
-        $selectedIndex = array_search($selectedWord,$wordList);;
+        $selectedIndex = array_search($selectedWord,$wordList);
 
         return $this->render(
             'SHLMLCoreBundle:SearchDocument:multipleSearch.html.twig',
@@ -193,6 +212,12 @@ class DocumentController extends Controller
                 "documentList" => $documentList)
         );
     }
+
+
+
+
+
+
 
 
     public function uploadAction()
