@@ -42,7 +42,7 @@ class DocumentController extends Controller
             $fuzzy_int = auto_fuzzy($terms[$i]);
             $query->setFieldOption("fuzziness",$fuzzy_int);
             $query->setFieldOption("max_expansions",10);
-            array_push($found,$finder->find($query,1000000));
+            array_push($found,$finder->find($query,100));
         }
 
         $combinations = array();
@@ -67,7 +67,7 @@ class DocumentController extends Controller
             $query = new \Elastica\Query\Match();
             $query->setFieldQuery('content', $combinations[$i]);
             $query->setFieldType('content','phrase');
-            $docs = $finder->find($query,1000000);
+            $docs = $finder->find($query,25);
 
             if ($docs != null) {
                 $results[$combinations[$i]] = array();
@@ -171,12 +171,12 @@ class DocumentController extends Controller
        //if (isset($_POST['searchedWord'])) $searchedWord = mb_convert_encoding( strtolower($_POST['searchedWord']), "UTF-8");
         //if (isset($_POST['searchedWord'])) $searchedWord = strtolower($_POST['searchedWord']);
        if (isset($_POST['searchedWord'])) {
-            if (mb_check_encoding($_POST['searchedWord'],'UTF-8')) $searchedWord = iconv('UTF-8', 'UTF-8', $_POST['searchedWord']);
+            if (mb_check_encoding($_POST['searchedWord'],'UTF-8')) $searchedWord =  $_POST['searchedWord'];
             else $searchedWord = iconv('ISO-8859-1', 'UTF-8', $_POST['searchedWord']);
-       } else $searchedWord =  "nancy";
+       } else $searchedWord =  "";
 
         if (isset($_POST['selectedWord'])){
-            if (mb_check_encoding($_POST['selectedWord'],'UTF-8')) $selectedWord = iconv('UTF-8', 'UTF-8', $_POST['selectedWord']);
+            if (mb_check_encoding($_POST['selectedWord'],'UTF-8')) $selectedWord =  $_POST['selectedWord'];
             else $selectedWord = iconv('ISO-8859-1', 'UTF-8', $_POST['selectedWord']);
         } else $selectedWord = $searchedWord;
 

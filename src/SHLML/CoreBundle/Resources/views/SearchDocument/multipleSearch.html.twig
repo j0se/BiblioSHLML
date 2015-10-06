@@ -16,6 +16,7 @@
             var documentList = {{ documentList|json_encode|raw }};
 
             var path = "http://localhost/BiblioSHLML/web/pdf/";
+            //var path="E://SHLML-T2/PDF_Split/";
 
             var i=0, currentLoad = documentList[i];
             var j= {{ selectedIndex }}, currentWord = selectedWord;
