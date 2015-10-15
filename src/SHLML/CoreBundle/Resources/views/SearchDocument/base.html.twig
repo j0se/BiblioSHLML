@@ -2,14 +2,20 @@
     header('Content-type: text/html; charset=utf-8');
 ?>
 
-<!DOCTYPE html>
-<html>
-
+<!doctype html>
+<html lang="fr">
 <head>
-    <title>{% block title %}Biblio application{% endblock %}</title>
+	<title> Plateforme SHLML </title>
+	<meta charset="utf-8">
+    <!-- Latest compiled and minified Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href='http://localhost/BiblioSHLML/web/bootstrap/css/bootstrap.css'>
+    <link rel="stylesheet" type="text/css" href='http://localhost/BiblioSHLML/web/bootstrap/css/bootstrap-theme.css'>
+    <link rel="stylesheet" type="text/css" media="screen" href='http://localhost/BiblioSHLML/web/stylesheets/main.css'>
+    <script src="https://cdn.rawgit.com/alertifyjs/alertify.js/v1.0.2/dist/js/alertify.js"></script>
+	<!--  <link rel="stylesheet" type="text/css"  media="all"   href='@routes.Assets.versioned("lib/bootstrap-fileinput/css/fileinput.min.css")' />   -->
 </head>
 
-<body style="width:70%;margin:auto;padding:0px;">
+<body style="width:100%;margin:auto;padding:0px;">
 
 {% block header %}
     <header>
@@ -17,25 +23,51 @@
         {% endblock %}
     </header>
 {% endblock %}
+<nav class="navbar navbar-inverse navbar-fluid" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      
+      </button> <a class="navbar-brand" href="/"><span class="red">Société d'histoire de la Lorraine et du musée lorrain</span></a>
+
+    </div>
+    
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav nav pull-right">
+      
+        <li><a href="http://www.societe-histoire-lorraine.com/">Accueil</a></li>
+        
+        <li><a href="http://localhost/BiblioSHLML/web/app_dev.php/single_search">Recherche simple</a></li>
+        
+        <li><a href="http://localhost/BiblioSHLML/web/app_dev.php/multiple_search">Recherche multiple</a></li>
+        
+        <li><a href="/">Guide d'utilisation</a></li>
+        
+        <li><a href="/">A propos</a></li>
+        
+        <li><a href="/">Contact</a></li>
+        
+      </ul>
+      
+    </div>
+  </div>  
+</nav>
+<!DOCTYPE html>
+<html>
+
+
+
+
+
 
 <div class="container body-container">
     {% block body %}
-        <div class="row">
-            <div id="main" class="col-sm-9">
                 {% block main %}{% endblock %}
-            </div>
-        </div>
     {% endblock %}
 </div>
 
 {% block footer %}
-    <footer>
-        <div class="container">
-        </div>
-    </footer>
+    
 {% endblock %}
-
-
 
 </body>
 </html>

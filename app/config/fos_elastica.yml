@@ -12,6 +12,8 @@ fos_elastica:
                     persistence:
                         driver: orm
                         model: SHLML\CoreBundle\Entity\Document
+                        elastica_to_model_transformer:
+                            query_builder_method: createSearchQueryBuilder
                         finder: ~
                         provider: ~
                         listener: ~

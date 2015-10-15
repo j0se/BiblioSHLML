@@ -12,4 +12,20 @@ use Doctrine\ORM\EntityRepository;
  */
 class DocumentRepository extends EntityRepository
 {
+
+    public function createSearchQueryBuilder($entityAlias)
+    {
+
+        $qb = $this->createQueryBuilder($entityAlias)
+                ->select('o.name','o.public');
+                //->from('document','u');
+                //->where($qb->expr()->eq('u.id', 1));
+        //$qb = $this->createQueryBuilder($entityAlias);
+
+        //$qb->select($entityAlias, 'g')
+            //->innerJoin($entityAlias.'.groups', 'g');
+
+        return $qb;
+    }
+
 }

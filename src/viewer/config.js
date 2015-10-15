@@ -21,9 +21,7 @@
 		readerControl.fullTextSearch(searchString);
 	}
 		
-    
-	
-	
+
 	$('<ul>').addClass('ui-widget ui-menu-dropdown').attr('id', 'optionsMenuList').hide()
 		.append("<li data-lang='fr'><a href=\"javascript:void(0)\">Français</a></li>")
         .append("<li data-lang='en'><a href=\"javascript:void(0)\">English</a></li>")
@@ -70,8 +68,11 @@
 		i18n.setLng("fr", function() {
             $('body').i18n();
         });
-    }); 
-	
+
+    });
+
+    //$(document).setZoomLevel(50);
+
 	$(document).on('documentLoaded', function() {
 		search(word);
     });  

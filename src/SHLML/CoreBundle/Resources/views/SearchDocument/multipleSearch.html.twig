@@ -4,32 +4,16 @@
     {% block javascripts %}
         <script src="http://localhost/BiblioSHLML/web/jquery-1.7.2.min.js"></script>
         <script src="http://localhost/BiblioSHLML/web/lib/WebViewer.min.js"></script>
-
-
-
         <script language="javascript" charset="UTF-8">
 
-            var searchedWord = '{{ searchedWord}}' ;
-            console.log(searchedWord);
-            var selectedWord = '{{ selectedWord }}';
-            var wordList = {{ wordList|json_encode|raw }};
-            var documentList = {{ documentList|json_encode|raw }};
-
+            var searchedWord = '{{ searchedWord}}', selectedWord = '{{ selectedWord }}';
+            var wordList = {{ wordList|json_encode|raw }}, documentList = {{ documentList|json_encode|raw }};
             var path = "http://localhost/BiblioSHLML/web/pdf/";
-            //var path="E://SHLML-T2/PDF_Split/";
-
-            var i=0, currentLoad = documentList[i];
-            var j= {{ selectedIndex }}, currentWord = selectedWord;
-
-            var viewerElement;
-            var myWebViewer;
+            var i=0 ;
+            var viewerElement, myWebViewer;
+			
             $(function() {
-
                 document.getElementById('#searchedWord').value=searchedWord;
-                document.getElementById('#selectedWord').value=selectedWord;
-                SelectWord.selectedIndex=j;
-
-
                 viewerElement = document.getElementById('viewer');
                 myWebViewer = new PDFTron.WebViewer({
                     path: "http://localhost/BiblioSHLML/web/lib",
@@ -39,98 +23,144 @@
                     enableReadOnlyMode: true
                 }, viewerElement);
 
-                $(viewerElement).on("toolModeChanged", function(event) {
+				 $(viewerElement).on("toolModeChanged", function(event) {
                     myWebViewer.setToolMode(PDFTron.WebViewer.ToolMode.Pan);
-                });
-
-                $('#nextDocumentButton').on('click', function() {
-                    if (++i > documentList.length-1 ) i--;
-                    else {
-                        myWebViewer.loadDocument(path + documentList[i]);
-                        currentLoad = documentList[i];
-                        SelectMenu.selectedIndex=i;
-                    }
-                });
-
-                $('#previousDocumentButton').on('click', function() {
-                    if (--i < 0) i++;
-                    else{
-                        myWebViewer.loadDocument(path + documentList[i]);
-                        currentLoad = documentList[i];
-                        SelectMenu.selectedIndex=i;
-                    }
                 });
             });
         </script>
-
-
     {% endblock %}
 
+	
+	
     {% block main %}
         <div>
             <script language="javascript" charset="UTF-8">
-                function changeDoc() {
-                    i = SelectMenu.selectedIndex;
-                    if (currentLoad != documentList[i]) {
-                        myWebViewer.loadDocument(path + documentList[i]);
-                        currentLoad = documentList[i];
-                        SelectMenu.selectedIndex = i;
-                    }
-                }
+                
+				
                 function changeWord(wordForm) {
-                    j = SelectWord.selectedIndex;
-                    document.getElementById('#selectedWord').value = wordList[j];
-                    if (currentWord != wordList[j]){
-                        SelectWord.selectedIndex=j;
-                        currentWord = wordList[j];
-                        document.getElementById('#wordForm').submit();
+                    document.getElementById('#searchForm').submit();
+                }
+				
+				function changeDoc() {
+                    myWebViewer.loadDocument(path + documentList[selectedDoc.selectedIndex]);
+                }
+				
+				function changeZoom(wordForm) {
+                    switch(zoomLevel.selectedIndex) {
+                        case 0:
+                            myWebViewer.setZoomLevel(0.25);
+                            break;
+                        case 1:
+                            myWebViewer.setZoomLevel(0.5);
+                            break;
+                        case 2:
+                            myWebViewer.setZoomLevel(0.75);
+                            break;
+                        case 3:
+                            myWebViewer.setZoomLevel(1);
+                            break;
+                        case 4:
+                            myWebViewer.setZoomLevel(1.5);
+                            break;
+                        case 5:
+                            myWebViewer.setZoomLevel(2);
+                            break;
+                        case 6:
+                            myWebViewer.setZoomLevel(3);
+                            break;
+                        default:
+                            myWebViewer.setZoomLevel(1);
                     }
                 }
-
+				
+			    function nextDoc() {
+                    if (++i > documentList.length-1 ) i--;
+                    else {
+						selectedDoc.selectedIndex=i;
+                        myWebViewer.loadDocument(path + documentList[i]);
+						myWebViewer.setZoomLevel(zoomLevel.value);
+                    }
+				}
+                
+                function prevDoc() {
+                    if (--i < 0) i++;
+                    else{
+						selectedDoc.selectedIndex=i;
+                        myWebViewer.loadDocument(path + documentList[i]);						
+						myWebViewer.setZoomLevel(zoomLevel.value);
+                    }
+                }
+				
+				function validateForm(){
+					document.getElementById("#selectedWord").value=null;
+					document.getElementById('#searchForm').submit();
+				}				
             </script>
 
-            <form id="#searchForm" method="POST" action="multiple_search" accept-charset="UTF-8">
-                <label> Texte recherché </label>
-                <input name="searchedWord" id="#searchedWord"/>
-                <input id="#searchButton" type="submit" value="Valider"> </input>
+			
+			
+			<legend class="sm-col-12">Plateforme de recherche multiple</legend>
+			
+            <form class="form-inline" role="form" id="#searchForm" method="POST" action="multiple_search" accept-charset="UTF-8">
+				<div class="form-group" style="float: left;">  
+					<label> Mot cherché : </label>
+					<input class="form-control" name="searchedWord" id="#searchedWord"/>
+					<input id="#searchButton" class="btn btn-default" value="Valider" onClick="validateForm()"> </input>
+				</div>
+				
+				<div class="form-group" style="text-align: center; margin-left:20px;">
+					<label>Mots similaires :</label>
+					<select class="form-control" style="width: 200px" name='selectedWord' id='#selectedWord' onChange='changeWord()'>
+						<script language="javascript" charset="UTF-8">
+							for(var k=0; k<wordList.length; k++){
+								if (k=={{ selectedIndex }}){
+									document.write("<option selected='selected'>" + wordList[k] + "</option>");
+								} else {
+									document.write("<option>" + wordList[k] + "</option>");
+								}
+							}
+						</script>
+					</select>
+				</div>
+				
+				<div class="form-group" style="float: right; margin-left:25px;"> 
+					<label> Niveau de zoom : </label>
+					<select class="form-control" style="width: 200px" name='zoomLevel' id='zoomLevel' onChange='changeZoom()'>
+						<option value=0.25> 25% </option>
+						<option value=0.5> 50% </option>
+						<option value=0.75> 75% </option>
+						<option value=1 selected="selected"> 100% </option>
+						<option value=1.5> 150% </option>
+						<option value=2> 200% </option>
+						<option value=3> 300% </option>
+					</select>
+				</div>
+				
+				<div class="form-group" style="float: left; margin-top:20px; margin-bottom:20px;"> 
+					<label> Choisissez un document dans la liste suivante:</label>
+					<select class="form-control" style="width: 290px" name='selectedDoc' id='selectedDoc' onChange='changeDoc()'>
+						<script language="javascript" charset="UTF-8">
+							for(var k=0; k<documentList.length; k++){
+								document.write("<option>" + documentList[k] + "</option>");
+							}
+						</script>
+					</select>
+				</div>
+				
+				
+				<div class="form-group" style="float: right; margin-top:20px; margin-bottom:20px;">	
+					<input id="previousDocumentButton" class="btn btn-default" type="button" value="Précédent document" onclick="prevDoc();"/>
+					<input id="nextDocumentButton" class="btn btn-default" type="button" value="Prochain document" onclick="nextDoc();"/>
+				</div> 
             </form>
+   			
 
-            <form id="#docForm" accept-charset="UTF-8">
-                Choisir un document contenant ce mot dans la liste déroulante:
-                <select style="width: 200px" name='SelectMenu' id='SelectMenu' onChange='changeDoc()'>
-                    <script language="javascript" charset="UTF-8">
-                        for(var k=0; k<documentList.length; k++){
-                            document.write("<option>" + documentList[k] + "</option>");
-                        }
-                    </script>
-                </select>
-            </form>
+        
 
-            <form id ='#wordForm' method="POST" action="multiple_search" accept-charset="UTF-8">
-                   Choisir un mot similaire dans la liste déroulante :
-
-                <select style="width: 200px" name='SelectWord' id='SelectWord' onChange='changeWord()'>
-
-                    <script language="javascript" charset="UTF-8">
-                        for(var k=0; k<wordList.length; k++){
-                            document.write("<option>" + wordList[k] + "</option>");
-                        }
-
-                        document.write("<input type='hidden' name='searchedWord' id='#searchedWord' value='" + searchedWord + "'/>" );
-                        document.write("<input type='hidden' name='selectedWord' id='#selectedWord' value='" + wordList[j] + "'/>" );
-                        document.write("<input type='hidden' name='wordList' id='#wordList' value='" + wordList + "'/>" );
-                        document.write("<input type='hidden' name='documentList' id='#documentList' value='" + documentList + "'/>" );
-                    </script>
-                </select>
-            </form>
-
-
-            <input id="previousDocumentButton" type="button" value="Précédent document"/>
-            <input id="nextDocumentButton" type="button" value="Prochain document"/>
-        </div>
-        <a href="http://localhost/BiblioSHLML/web/app_dev.php/index"> Revenir à la page d'accueil </a>
-
-        <div id="viewer" style="height: 700px;"/>
-
+    <script language="javascript" charset="UTF-8">
+        var larg = screen.width;
+        var haut = screen.height;
+        document.write("<div id='viewer' style='height:"+ 0.8*haut +"px;width: " + 0.7*larg +"px;'/>");
+    </script>
     {% endblock %}
 

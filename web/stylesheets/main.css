@@ -1,0 +1,47 @@
+
+
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+body {
+    padding-bottom: 30px;
+    min-width: 970px;
+}
+
+footer {
+    text-align: center;
+}
+
+
+
+span.left {
+  margin-left: 10%;
+  float: left;
+}
+span.center{
+  text-align: center;
+}
+span.right {
+  margin-right: 10%;
+  float: right;
+}
+
+form.form-horizontal{
+	margin-right: 5%;
+}
+
+.fileUpload {
+    position: relative;
+    overflow: hidden;
+    margin: 10px;
+}
+.fileUpload input.upload {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
