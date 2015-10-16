@@ -6,26 +6,47 @@
 
         <script language="javascript">
 
-            var searchedWord = '{{ searchedWord }}' ;
-            var selectedWord ='{{ selectedWord }}';
-            var wordList = {{ wordList|json_encode|raw }};
-            var selectedDocument = '{{ selectedDocument }}';
-            var j= {{ selectedIndex }};
+
+            function replaceQueryParam(param, newval) {
+                var search = window.location.search;
+                var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
+                var query = search.replace(regex, "$1").replace(/&$/, '');
+                return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
+            }
+
+            function recup_GET(param) {
+                var vars = {};
+                window.location.href.replace(
+                        /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                        function( m, key, value ) { // callback
+                            vars[key] = value !== undefined ? value : '';
+                        }
+                );
+
+                if ( param ) {
+                    return vars[param] ? vars[param] : null;
+                }
+                return vars;
+            }
+
+
+            var tomeList = {{ tomeList|json_encode|raw }};
+            var docList = {{ docList|json_encode|raw }};
+            var searchedWord = '{{searchedWord}}';
 
             var path = "http://localhost/BiblioSHLML/web/pdf/";
-            //var path="E://SHLML-T2//PDF_Split";
-
+            var i=0;
             var viewerElement;
             var myWebViewer;
 
             $(function() {
-                document.getElementById('#searchedWord').value=searchedWord;
-                document.getElementById('#selectedWord').value=selectedWord;
+
+                document.getElementById('searchedWord').value=searchedWord;
                 viewerElement = document.getElementById('viewer');
                 myWebViewer = new PDFTron.WebViewer({
                     path: "http://localhost/BiblioSHLML/web/lib",
-                    initialDoc: path + selectedDocument,
-                    custom: selectedWord,
+                    initialDoc: path + docList[selectedDoc.selectedIndex],
+                    custom: searchedWord,
                     showToolbarControl: false,
                     enableReadOnlyMode: true
                 }, viewerElement);
@@ -37,18 +58,155 @@
         </script>
 
         <script language="javascript">
-            function changeWord(form) {
-                j = SelectWord.selectedIndex;
-                document.getElementById('#selectedWord').value=wordList[j];
-                document.getElementById('#form').submit();
-            }
+
 
         </script>
     {% endblock %}
 
     {% block main %}
         <div>
+            <script language="javascript" charset="UTF-8">
 
+                function changeTome(){
+                    str = replaceQueryParam('selectedTome', tomeList[selectedTome.selectedIndex]);
+                    window.history.replaceState(document.selectedTome,document.selectedTome,str);
+                    document.getElementById('searchForm').submit();
+                }
+
+                function changeDoc() {
+                    myWebViewer.loadDocument(path + docList[selectedDoc.selectedIndex]);
+                    str = replaceQueryParam('selectedDoc', docList[selectedDoc.selectedIndex]);
+                    window.history.replaceState(document.selectedDoc,document.selectedDoc,str);
+                }
+
+                function changeZoom(wordForm) {
+                    switch(zoomLevel.selectedIndex) {
+                        case 0:
+                            myWebViewer.setZoomLevel(0.25);
+                            break;
+                        case 1:
+                            myWebViewer.setZoomLevel(0.5);
+                            break;
+                        case 2:
+                            myWebViewer.setZoomLevel(0.75);
+                            break;
+                        case 3:
+                            myWebViewer.setZoomLevel(1);
+                            break;
+                        case 4:
+                            myWebViewer.setZoomLevel(1.5);
+                            break;
+                        case 5:
+                            myWebViewer.setZoomLevel(2);
+                            break;
+                        case 6:
+                            myWebViewer.setZoomLevel(3);
+                            break;
+                        default:
+                            myWebViewer.setZoomLevel(1);
+                    }
+                }
+
+                function nextDoc() {
+                    if (++i > docList.length-1 ) i--;
+                    else {
+                        selectedDoc.selectedIndex=i;
+                        myWebViewer.loadDocument(path + docList[i]);
+                        str = replaceQueryParam('selectedDoc', docList[i]);
+                        window.history.replaceState(document.selectedDoc,document.selectedDoc,str);
+                        myWebViewer.setZoomLevel(zoomLevel.value);
+                    }
+                }
+
+                function prevDoc() {
+                    if (--i < 0) i++;
+                    else{
+                        selectedDoc.selectedIndex=i;
+                        myWebViewer.loadDocument(path + docList[i]);
+                        str = replaceQueryParam('selectedDoc', docList[i]);
+                        window.history.replaceState(document.selectedDoc,document.selectedDoc,str);
+                        myWebViewer.setZoomLevel(zoomLevel.value);
+                    }
+                }
+
+            </script>
+        </div>
+
+            <legend class="sm-col-16">Plateforme de recherche par tome</legend>
+
+            <form class="form-inline" role="form" id="searchForm" method="GET" action="single_search" accept-charset="UTF-8">
+
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <div class="span16">
+
+                            <div class="form-group"  style="margin-right:40px;">
+                                <label> Recherche : </label>
+                                <input class="form-control" style="width:150px;" name="searchedWord" id="searchedWord"/>
+                                <input id="#searchButton" type="submit" class="btn btn-default" value="Valider"> </input>
+                            </div>
+
+                            <div class="form-group" style="margin-right:40px;">
+                                <label>Choisir un tome :</label>
+                                <select class="form-control" style="width: 200px" name='selectedTome' id='selectedTome' onChange='changeTome()'>
+                                    <script language="javascript" charset="UTF-8">
+                                        for(var k=0; k<tomeList.length; k++){
+                                            if (tomeList[k]==recup_GET('selectedTome')){
+                                                document.write("<option selected='selected'>" + tomeList[k] + "</option>");
+                                            } else {
+                                                document.write("<option>" + tomeList[k] + "</option>");
+                                            }
+                                        }
+                                    </script>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label> Niveau de zoom : </label>
+                                <select class="form-control" style="width: 100px" name='zoomLevel' id='zoomLevel' onChange='changeZoom()'>
+                                    <option value=0.25> 25% </option>
+                                    <option value=0.5> 50% </option>
+                                    <option value=0.75> 75% </option>
+                                    <option value=1 selected="selected"> 100% </option>
+                                    <option value=1.5> 150% </option>
+                                    <option value=2> 200% </option>
+                                    <option value=3> 300% </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" style="margin-right:40px; margin-bottom:20px; margin-top:20px;">
+                                <label> Choisir un document :</label>
+                                <select class="form-control" style="width: 290px" name='selectedDoc' id='selectedDoc' onChange='changeDoc()'>
+                                    <script language="javascript" charset="UTF-8">
+                                        for(var k=0; k<docList.length; k++){
+                                            if (docList[k]==recup_GET('selectedDoc')){
+                                                document.write("<option selected='selected'>" + docList[k] + "</option>");
+                                                i=k;
+                                            } else {
+                                                document.write("<option>" + docList[k] + "</option>");
+                                            }
+                                        }
+                                    </script>
+                                </select>
+                            </div>
+
+                            <div class="form-group" style="margin-top:20px; margin-bottom:20px;">
+                                <input id="previousDocumentButton" class="btn btn-default" type="button" value="Précédent document" onclick="prevDoc();"/>
+                                <input id="nextDocumentButton" class="btn btn-default" type="button" value="Prochain document" onclick="nextDoc();"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        <script language="javascript" charset="UTF-8">
+            var larg = screen.width;
+            var haut = screen.height;
+            document.write("<div id='viewer' style='height:"+ 0.8*haut +"px;width:100%;' />");
+        </script>
+    {% endblock %}
+
+            {#
             <form id="#form" method="POST" action="single_search">
                 <label> Texte Recherché </label>
                 <input name="searchedWord" id="#searchedWord"/>;
@@ -78,4 +236,4 @@
         <div id="viewer" style="height: 700px;"/>
 
     {% endblock %}
-
+#}

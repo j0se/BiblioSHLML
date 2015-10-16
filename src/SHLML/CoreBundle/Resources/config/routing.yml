@@ -18,6 +18,10 @@ singleSearch_page:
     path: /single_search
     defaults: {_controller: SHLMLCoreBundle:Document:singleSearchPage}
 
-search:
-    path:     /search/{term}
-    defaults: { _controller: SHLMLCoreBundle:Document:search }
+guide:
+    path:     /guide
+    defaults: { _controller: SHLMLCoreBundle:Document:guide }
+
+contact:
+    path:     /contact
+    defaults: { _controller: SHLMLCoreBundle:Document:contact }

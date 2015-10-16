@@ -72,7 +72,8 @@
     });
 
     //$(document).setZoomLevel(50);
-
+	
+	
 	$(document).on('documentLoaded', function() {
 		search(word);
     });  
