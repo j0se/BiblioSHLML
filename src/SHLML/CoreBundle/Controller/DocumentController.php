@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Elastica\Query;
 
 mb_internal_encoding('UTF-8');
+mb_http_output('UTF-8');
+header( 'content-type: text/html; charset=utf-8' );
 ini_set('memory_limit', '1024M');
 
 class DocumentController extends Controller
@@ -22,10 +24,10 @@ class DocumentController extends Controller
     public function mutipleSearchWithElasticSearch($searchedTerm, $selectedTerm){
 
 	   function auto_fuzzy($term){
-			if (strlen($term)<=2) $fuzzy_int=0;
-			elseif (strlen($term)<10) $fuzzy_int=1;
-			elseif (strlen($term)<17) $fuzzy_int=2;
-			elseif (strlen($term)<=23) $fuzzy_int=3;
+			if (mb_strlen($term)<=2) $fuzzy_int=0;
+			elseif (mb_strlen($term)<10) $fuzzy_int=1;
+			elseif (mb_strlen($term)<17) $fuzzy_int=2;
+			elseif (mb_strlen($term)<=23) $fuzzy_int=3;
 			else $fuzzy_int=4;
 			return $fuzzy_int;
         }
@@ -95,10 +97,8 @@ class DocumentController extends Controller
             $query = new \Elastica\Query\Match();
             $query->setFieldQuery('content', $combinations[$i]);
             $query->setFieldType('content','phrase');
-			if ($combinations[$i]==$searchedTerm){
-				$docs = $finder->find($query,50);
-			} else if ($combinations[$i]==$selectedTerm){
-                $docs = $finder->find($query,50);
+			if ($combinations[$i]==$selectedTerm){
+                $docs = $finder->find($query,100);
             } else {
 				$docs = $finder->find($query,1);
 			}
@@ -148,37 +148,19 @@ class DocumentController extends Controller
     }
 
 
-    public function indexAction()
-    {
-        return $this->render('SHLMLCoreBundle:SearchDocument:index.html.twig');
-    }
-
-
-    public function guideAction()
-    {
-        return $this->render('SHLMLCoreBundle:SearchDocument:guide.html.twig');
-    }
-
-
-    public function contactAction()
-    {
-        return $this->render('SHLMLCoreBundle:SearchDocument:contact.html.twig');
-    }
 
     public function singleSearchPageAction(Request $request)
     {
         if (isset($_GET['searchedWord'])) {
-            if (mb_check_encoding($_GET['searchedWord'],'UTF-8')) $searchedWord =  preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ", strtolower($_GET['searchedWord']));
-            else $searchedWord = iconv('ISO-8859-1', 'UTF-8', preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ",strtolower($_GET['searchedWord'])));
-        } else $searchedWord =  "lorraine";
+            $searchedWord =  mb_ereg_replace("-", "", mb_strtolower($_GET['searchedWord']));
+        } else $searchedWord =  "";
 
         if (isset($_GET['selectedTome'])) {
-            if (mb_check_encoding($_GET['selectedTome'],'UTF-8')) $selectedTome =  $_GET['selectedTome'];
-            else $selectedTome = iconv('ISO-8859-1', 'UTF-8', $_GET['selectedTome']);
+            $selectedTome =  $_GET['selectedTome'];
         } else $selectedTome =  "SHLML_WIENER_A_01";
 
-        $em = $this->getDoctrine()->getManager();
 
+        $em = $this->getDoctrine()->getManager();
         $results = $em->createQuery("SELECT u.name FROM SHLML\CoreBundle\Entity\Book u")->getResult();
         $tomeList=array();
         foreach  ($results as $tab){
@@ -188,14 +170,10 @@ class DocumentController extends Controller
         $tomeID = $em->createQuery("SELECT u.id FROM SHLML\CoreBundle\Entity\Book u WHERE u.name =:tome" )->setParameter('tome',$selectedTome)->getResult();
         $results = $em->createQuery("SELECT u.name, u.public FROM SHLML\CoreBundle\Entity\Document u WHERE u.book =:tomeID")->setParameter('tomeID',$tomeID)->getResult();
         $docList = array();
-
         foreach  ($results as $tab){
             array_push($docList,$tab['name']);
         }
 
-
-        //var_dump($tomeList);
-        //var_dump($docList);
         return $this->render(
             'SHLMLCoreBundle:SearchDocument:singleSearch.html.twig',
             array(
@@ -203,35 +181,25 @@ class DocumentController extends Controller
                 "tomeList" => $tomeList,
                 "docList" => $docList,
             )
-        ); //, array('posts' => $posts));
+        );
     }
-
-
-
-
-
-
 
 
 
     public function multipleSearchPageAction(Request $request)
     {
-		
         if (isset($_GET['searchedWord'])) {
-            if (mb_check_encoding($_GET['searchedWord'],'UTF-8')) $searchedWord =  preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ", strtolower($_GET['searchedWord']));
-            else $searchedWord = iconv('ISO-8859-1', 'UTF-8', preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ",strtolower($_GET['searchedWord'])));
-        } else $searchedWord =  "paul verlaine";
+            $searchedWord = mb_ereg_replace("-", "", mb_strtolower($_GET['searchedWord']));
+           } else $searchedWord =  "paul verlaine";
 
         if (isset($_GET['selectedWord'])){
-            if (mb_check_encoding($_GET['selectedWord'],'UTF-8')) $selectedWord =  preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ",strtolower($_GET['selectedWord']));
-            else $selectedWord = iconv('ISO-8859-1', 'UTF-8', preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ",strtolower($_GET['selectedWord'])));
+            $selectedWord =  mb_ereg_replace("-", "",mb_strtolower($_GET['selectedWord']));
         } else $selectedWord = $searchedWord;
 
         $result = \SHLML\CoreBundle\Controller\DocumentController::mutipleSearchWithElasticSearch($searchedWord,$selectedWord);
         $docList = $result[0];
         $wordList=$result[1];
 
-        $selectedIndex = array_search($selectedWord,$wordList);
 		if (!isset($_GET['selectedDoc'])){
 			$_GET['selectedDoc']=$docList[0];
 		}
@@ -248,9 +216,20 @@ class DocumentController extends Controller
 
 
 
+    public function indexAction()
+    {
+        return $this->render('SHLMLCoreBundle:SearchDocument:index.html.twig');
+    }
 
+    public function guideAction()
+    {
+        return $this->render('SHLMLCoreBundle:SearchDocument:guide.html.twig');
+    }
 
-
+    public function contactAction()
+    {
+        return $this->render('SHLMLCoreBundle:SearchDocument:contact.html.twig');
+    }
 
 
     public function uploadAction()
@@ -309,6 +288,18 @@ class DocumentController extends Controller
     //$query->setFieldZeroTermsQuery('content');
     //$query->setFieldOption("fields",'name');
     //var_dump($query);
+
+    //if (mb_check_encoding($_GET['selectedTome'],'UTF-8')) $selectedTome =  $_GET['selectedTome'];
+    //else $selectedTome = iconv('ISO-8859-1', 'UTF-8', $_GET['selectedTome']);
+
+    //if (mb_check_encoding($_GET['searchedWord'],'UTF-8')) $searchedWord =  preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ", strtolower($_GET['searchedWord']));
+    //else $searchedWord = iconv('ISO-8859-1', 'UTF-8', preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ",strtolower($_GET['searchedWord'])));
+
+    //if (mb_check_encoding($_GET['searchedWord'],'UTF-8')) $searchedWord =  preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ", strtolower($_GET['searchedWord']));
+    //else $searchedWord = iconv('ISO-8859-1', 'UTF-8', preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ",strtolower($_GET['searchedWord'])));
+
+    //if (mb_check_encoding($_GET['selectedWord'],'UTF-8')) $selectedWord =  preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ",strtolower($_GET['selectedWord']));
+    //else $selectedWord = iconv('ISO-8859-1', 'UTF-8', preg_replace("#[^a-zA-Z-0-9-é-è-à-ç]#", " ",strtolower($_GET['selectedWord'])));
 
 
 }

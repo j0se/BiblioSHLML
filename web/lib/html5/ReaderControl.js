@@ -1445,7 +1445,7 @@
             var searchResultLineId = 0;
             var word = "";
             if (pattern !== '') {
-                var mode = me.docViewer.SearchMode.e_page_stop | me.docViewer.SearchMode.e_ambient_string | me.docViewer.SearchMode.e_highlight | me.docViewer.SearchMode.e_whole_word;
+                var mode = me.docViewer.SearchMode.e_page_stop | me.docViewer.SearchMode.e_ambient_string | me.docViewer.SearchMode.e_highlight ;//| me.docViewer.SearchMode.e_whole_word;
                 //if (bool!="false") {
 
                 //

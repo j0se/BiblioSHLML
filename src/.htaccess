@@ -5,3 +5,5 @@
     Order deny,allow
     Deny from all
 </IfModule>
+
+AddDefaultCharset utf-8

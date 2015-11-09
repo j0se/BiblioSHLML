@@ -1,11 +1,8 @@
 {% extends 'SHLMLCoreBundle:SearchDocument:base.html.twig' %}
 
     {% block javascripts %}
-        <script src="http://localhost/BiblioSHLML/web/jquery-1.7.2.min.js"></script>
-        <script src="http://localhost/BiblioSHLML/web/lib/WebViewer.min.js"></script>
 
         <script language="javascript">
-
 
             function replaceQueryParam(param, newval) {
                 var search = window.location.search;
@@ -33,8 +30,8 @@
             var tomeList = {{ tomeList|json_encode|raw }};
             var docList = {{ docList|json_encode|raw }};
             var searchedWord = '{{searchedWord}}';
-
-            var path = "http://localhost/BiblioSHLML/web/pdf/";
+            searchedWord = searchedWord.replace("&#039;", "'");
+            var path = "../../../../../../BiblioSHLML/web/pdf/";
             var i=0;
             var viewerElement;
             var myWebViewer;
@@ -44,7 +41,7 @@
                 document.getElementById('searchedWord').value=searchedWord;
                 viewerElement = document.getElementById('viewer');
                 myWebViewer = new PDFTron.WebViewer({
-                    path: "http://localhost/BiblioSHLML/web/lib",
+                    path: "../../../../../../BiblioSHLML/web/lib",
                     initialDoc: path + docList[selectedDoc.selectedIndex],
                     custom: searchedWord,
                     showToolbarControl: false,
@@ -74,7 +71,8 @@
                 }
 
                 function changeDoc() {
-                    myWebViewer.loadDocument(path + docList[selectedDoc.selectedIndex]);
+					i = selectedDoc.selectedIndex;
+                    myWebViewer.loadDocument(path + docList[i]);
                     str = replaceQueryParam('selectedDoc', docList[selectedDoc.selectedIndex]);
                     window.history.replaceState(document.selectedDoc,document.selectedDoc,str);
                 }

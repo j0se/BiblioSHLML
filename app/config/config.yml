@@ -39,6 +39,7 @@ twig:
     debug:            "%kernel.debug%"
     strict_variables: "%kernel.debug%"
 
+
 # Assetic Configuration
 assetic:
     debug:          "%kernel.debug%"
@@ -98,3 +99,4 @@ sonata_block:
 sonata_admin:
     title: Administration SHLML
     #title_logo: bundles/acmedemo/img/fancy_acme_logo.png
+

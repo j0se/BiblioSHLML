@@ -2,35 +2,34 @@
 {% extends 'SHLMLCoreBundle:SearchDocument:base.html.twig' %}
 
     {% block javascripts %}
-        <script src="http://localhost/BiblioSHLML/web/jquery-1.7.2.min.js"></script>
-        <script src="http://localhost/BiblioSHLML/web/lib/WebViewer.min.js"></script>
-        <script language="javascript" charset="UTF-8">
-
-		function replaceQueryParam(param, newval) {
-			var search = window.location.search;
-			var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
-			var query = search.replace(regex, "$1").replace(/&$/, '');
-			return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
-		}
-
-		function recup_GET(param) {
-			var vars = {};
-			window.location.href.replace(
-				/[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
-				function( m, key, value ) { // callback
-					vars[key] = value !== undefined ? value : '';
-				}
-			);
-
-			if ( param ) {
-				return vars[param] ? vars[param] : null;	
+		<script language="javascript" charset="UTF-8">
+			function replaceQueryParam(param, newval) {
+				var search = window.location.search;
+				var regex = new RegExp("([?;&])" + param + "[^&;]*[;&]?");
+				var query = search.replace(regex, "$1").replace(/&$/, '');
+				return (query.length > 2 ? query + "&" : "?") + (newval ? param + "=" + newval : '');
 			}
-			return vars;
-		}
+
+			function recup_GET(param) {
+				var vars = {};
+				window.location.href.replace(
+					/[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+					function( m, key, value ) { // callback
+						vars[key] = value !== undefined ? value : '';
+					}
+				);
+
+				if ( param ) {
+					return vars[param] ? vars[param] : null;
+				}
+				return vars;
+			}
 			
             var searchedWord = '{{ searchedWord}}', selectedWord = '{{ selectedWord }}';
+			searchedWord = searchedWord.replace("&#039;", "'");
+			selectedWord = selectedWord.replace("&#039;", "'");
             var wordList = {{ wordList|json_encode|raw }}, documentList = {{ documentList|json_encode|raw }};
-            var path = "http://localhost/BiblioSHLML/web/pdf/";
+            var path = "../../../../../../BiblioSHLML/web/pdf/";
             var i=0 ;
 			var initialDoc = documentList[0];
 			if (recup_GET('selectedDoc')!=null){
@@ -43,7 +42,7 @@
                 document.getElementById('searchedWord').value=searchedWord;
                 viewerElement = document.getElementById('viewer');
                 myWebViewer = new PDFTron.WebViewer({
-                    path: "http://localhost/BiblioSHLML/web/lib",
+                    path: "../../../../../../BiblioSHLML/web/lib",
                     initialDoc: path + initialDoc,
                     custom: selectedWord,
                     showToolbarControl: false,
@@ -55,7 +54,7 @@
                 });								
             });
 			
-        </script>
+		</script>
     {% endblock %}
 
 	
@@ -70,9 +69,10 @@
                 }
 				
 				function changeDoc() {
-                    myWebViewer.loadDocument(path + documentList[selectedDoc.selectedIndex]);
+					i=selectedDoc.selectedIndex;
+                    myWebViewer.loadDocument(path + documentList[i]);
 					str = replaceQueryParam('selectedDoc', documentList[selectedDoc.selectedIndex]);
-						window.history.replaceState(document.selectedDoc,document.selectedDoc,str);	
+					window.history.replaceState(document.selectedDoc,document.selectedDoc,str);	
                 }
 				
 				function changeZoom(wordForm) {
