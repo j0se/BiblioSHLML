@@ -1,22 +1,7 @@
 {% extends 'SHLMLCoreBundle:SearchDocument:base.html.twig' %}
 
     {% block javascripts %}
-        <script src="http://localhost/BiblioSHLML/web/jquery-1.7.2.min.js">  </script>
-        <script src="http://localhost/BiblioSHLML/web/lib/WebViewer.min.js"> </script>
 
-        <script language="javascript">
-            $(function() {
-                var viewerElement = document.getElementById('viewer');
-                var myWebViewer = new PDFTron.WebViewer({
-                    path: "http://localhost/BiblioSHLML/web/lib",
-                    initialDoc: "http://localhost/BiblioSHLML/web/accueil.pdf",
-                    //initialDoc: "MmYzMDY0YWItZWNkYS00MWI0LThjMGMtMGJjYjlmOWNhNmMz",
-                    showToolbarControl: false,
-                    enableReadOnlyMode: true
-                }, viewerElement);
-
-            });
-        </script>
     {% endblock %}
 
     {% block main %}

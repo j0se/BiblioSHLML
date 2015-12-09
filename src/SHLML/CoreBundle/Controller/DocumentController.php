@@ -106,8 +106,8 @@ class DocumentController extends Controller
             if ($docs != null) {
                 $results[$combinations[$i]] = array();
                 for ($j = 0; $j < sizeof($docs); $j++) {
-                  if($this->get('security.context')->isGranted('ROLE_USER') || $docs[$j]['public']){  //->getPublic()) {
-                        array_push($results[$combinations[$i]], $docs[$j]['name']);//->getPath());
+                  if($this->get('security.context')->isGranted('ROLE_USER') || $docs[$j]->getPublic()) {
+                        array_push($results[$combinations[$i]], $docs[$j]->getPath());
                   }
                 }
             }
