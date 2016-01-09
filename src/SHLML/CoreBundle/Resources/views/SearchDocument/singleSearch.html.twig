@@ -31,6 +31,8 @@
             var docList = {{ docList|json_encode|raw }};
             var searchedWord = '{{searchedWord}}';
             searchedWord = searchedWord.replace("&#039;", "'");
+			
+			
             var path = "../../web/pdf/";
             var i=0;
             var viewerElement;

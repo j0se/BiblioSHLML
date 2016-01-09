@@ -28,11 +28,16 @@
             var searchedWord = '{{ searchedWord}}', selectedWord = '{{ selectedWord }}';
             searchedWord = searchedWord.replace("&#039;", "'");
             selectedWord = selectedWord.replace("&#039;", "'");
-            var wordList = {{ wordList|json_encode|raw }}, documentList = {{ documentList|json_encode|raw }};
+			if(selectedWord==""){
+				selectedWord = searchedWord;
+			}
+            var wordList = {{ wordList|json_encode|raw }};
+			var	docList = {{ documentList|json_encode|raw }};
             var path = "../../web/pdf/";
             var i=0 ;
-            var initialDoc = documentList[0];
-            if (recup_GET('selectedDoc')!=null){
+            var initialDoc = docList[0];
+			var docLoaded = true;
+            if (recup_GET('selectedDoc')!=null && recup_GET('selectedDoc')!=""){
                 initialDoc=recup_GET('selectedDoc');
             }
             var viewerElement, myWebViewer;
@@ -52,6 +57,11 @@
                 $(viewerElement).on("toolModeChanged", function(event) {
                     myWebViewer.setToolMode(PDFTron.WebViewer.ToolMode.Pan);
                 });
+				
+				$(viewerElement).on("documentLoaded", function(event) {
+                    docLoaded = true;
+                    console.log("document loaded");
+                });
             });
 
         </script>
@@ -64,14 +74,14 @@
     <script language="javascript" charset="UTF-8">
 
         function changeWord(wordForm) {
-            document.getElementById("selectedDoc").value=null;
+            document.getElementById('selectedDoc').selectedIndex=docList.length;
             document.getElementById('searchForm').submit();
         }
 
         function changeDoc() {
             i=selectedDoc.selectedIndex;
-            myWebViewer.loadDocument(path + documentList[i]);
-            str = replaceQueryParam('selectedDoc', documentList[selectedDoc.selectedIndex]);
+            myWebViewer.loadDocument(path + docList[i]);
+            str = replaceQueryParam('selectedDoc', docList[selectedDoc.selectedIndex]);
             window.history.replaceState(document.selectedDoc,document.selectedDoc,str);
             zoomLevel.value=1;
         }
@@ -133,8 +143,8 @@
         }
 
         function validateForm(){
-            document.getElementById("selectedWord").value=null;
-            document.getElementById("selectedDoc").value=null;
+			document.getElementById('selectedWord').selectedIndex=wordList.length;
+			document.getElementById('selectedDoc').selectedIndex=docList.length;			
         }
 
 
@@ -167,6 +177,7 @@
                                         document.write("<option>" + wordList[k] + "</option>");
                                     }
                                 }
+								document.write("<option hidden></option>");
                             </script>
                         </select>
                     </div>
@@ -188,14 +199,15 @@
                         <label> Choisissez un document dans la liste suivante:</label>
                         <select class="form-control" style="width: 290px" name='selectedDoc' id='selectedDoc' onChange='changeDoc()'>
                             <script language="javascript" charset="UTF-8">
-                                for(var k=0; k<documentList.length; k++){
-                                    if (documentList[k]==recup_GET('selectedDoc')){
-                                        document.write("<option selected='selected'>" + documentList[k] + "</option>");
+                                for(var k=0; k<docList.length; k++){
+                                    if (docList[k]==recup_GET('selectedDoc')){
+                                        document.write("<option selected='selected'>" + docList[k] + "</option>");
                                         i=k;
                                     } else {
-                                        document.write("<option>" + documentList[k] + "</option>");
+                                        document.write("<option>" + docList[k] + "</option>");
                                     }
                                 }
+								document.write("<option hidden></option>");
                             </script>
                         </select>
                     </div>
@@ -211,7 +223,7 @@
     </form>
 
     <script language="javascript" charset="UTF-8">
-        var larg = screen.width;
+        var larg = screen.width; 
         var haut = screen.height;
         document.write("<div id='viewer' style='height:"+ 0.8*haut +"px;width:100%;' />");
     </script>

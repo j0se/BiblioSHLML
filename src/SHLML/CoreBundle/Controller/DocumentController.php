@@ -23,6 +23,9 @@ class DocumentController extends Controller
      */
     public function mutipleSearchWithElasticSearch($searchedTerm, $selectedTerm){
 
+		if($selectedTerm==""){
+			$selectedTerm=$searchedTerm;
+		}
 	   function auto_fuzzy($term){
 			if (mb_strlen($term)<=2) $fuzzy_int=0;
 			elseif (mb_strlen($term)<10) $fuzzy_int=1;
@@ -190,11 +193,11 @@ class DocumentController extends Controller
     {
         if (isset($_GET['searchedWord'])) {
             $searchedWord = mb_ereg_replace("-", "", mb_strtolower($_GET['searchedWord']));
-           } else $searchedWord =  "paul verlaine";
+           } else $searchedWord =  "";
 
-        if (isset($_GET['selectedWord'])){
+        if (isset($_GET['selectedWord']) && $_GET['selectedWord']!=""){				
             $selectedWord =  mb_ereg_replace("-", "",mb_strtolower($_GET['selectedWord']));
-        } else $selectedWord = $searchedWord;
+        } else $selectedWord = "";
 
         $result = \SHLML\CoreBundle\Controller\DocumentController::mutipleSearchWithElasticSearch($searchedWord,$selectedWord);
         $docList = $result[0];
